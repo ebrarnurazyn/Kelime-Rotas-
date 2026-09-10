@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kelime
+      POSTGRES_PASSWORD: kelime
+      POSTGRES_DB: kelime_rotasi
+    ports:
+      - "5432:5432"
+    volumes:
+      - kelime_rotasi_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kelime -d kelime_rotasi"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://kelime:kelime@db:5432/kelime_rotasi?schema=public
+      DIRECT_URL: postgresql://kelime:kelime@db:5432/kelime_rotasi?schema=public
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  kelime_rotasi_db_data:
