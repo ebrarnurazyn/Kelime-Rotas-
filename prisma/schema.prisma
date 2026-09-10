@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/src/backend/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Teacher {
+  id           String   @id @default(cuid())
+  name         String   @default("")
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  classes      Class[]
+
+  @@map("teachers")
+}
+
+model Class {
+  id        String    @id @default(cuid())
+  teacherId String
+  teacher   Teacher   @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  name      String
+  code      String    @unique
+  createdAt DateTime  @default(now())
+  students  Student[]
+
+  @@map("classes")
+}
+
+model Student {
+  id              String         @id @default(cuid())
+  classId         String
+  class           Class          @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name            String
+  points          Int            @default(0)
+  streak          Int            @default(0)
+  lastDay         String?
+  badges          Json           @default("{}")
+  everPerfectQuiz Boolean        @default(false)
+  everComeback    Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  lastActive      DateTime       @default(now())
+  wordProgress    WordProgress[]
+
+  @@map("students")
+}
+
+model WordProgress {
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  wordKey     String
+  status      String   @default("new")
+  wrong       Int      @default(0)
+  consecutive Int      @default(0)
+  updatedAt   DateTime @default(now())
+
+  @@id([studentId, wordKey])
+  @@map("word_progress")
+}
