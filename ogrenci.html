@@ -1,0 +1,2539 @@
+<title>Kelime Rotası</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kelime Rotası">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B2140;
+    --ink-soft: #3A3F66;
+    --paper: #F3F4FB;
+    --paper-raised: #FFFFFF;
+    --line: #DBDDEF;
+    --muted: #696E96;
+    --accent: #5B4FE9;
+    --accent-ink: #FFFFFF;
+    --good: #10B981;
+    --good-soft: #D9F6EA;
+    --bad: #D8483F;
+    --bad-soft: #FBE7E4;
+    --star: #7C3AED;
+    --star-soft: #ECE3FD;
+    --bad-ink: #FFFFFF;
+    --hero-a: #E9E1FF;
+    --hero-b: #DCEBFF;
+    --hero-c: #DCFAEF;
+    --shadow: 220 45% 20%;
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #EDEEFB;
+      --ink-soft: #C6C9EC;
+      --paper: #12142B;
+      --paper-raised: #1C1F3E;
+      --line: #2E3159;
+      --muted: #9498C4;
+      --accent: #8C7CFF;
+      --accent-ink: #16102E;
+      --good: #34E7B4;
+      --good-soft: #123428;
+      --bad: #F17469;
+      --bad-soft: #3A1F1F;
+      --star: #C4B5FD;
+      --star-soft: #2E2350;
+      --bad-ink: #2B1210;
+      --hero-a: #2B1B54;
+      --hero-b: #142850;
+      --hero-c: #0C3B34;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ink: #EDEEFB;
+    --ink-soft: #C6C9EC;
+    --paper: #12142B;
+    --paper-raised: #1C1F3E;
+    --line: #2E3159;
+    --muted: #9498C4;
+    --accent: #8C7CFF;
+    --accent-ink: #16102E;
+    --good: #34E7B4;
+    --good-soft: #123428;
+    --bad: #F17469;
+    --bad-soft: #3A1F1F;
+    --star: #C4B5FD;
+    --star-soft: #2E2350;
+    --bad-ink: #2B1210;
+    --hero-a: #2B1B54;
+    --hero-b: #142850;
+    --hero-c: #0C3B34;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  /* Belt-and-braces: an element's own `display` rule (e.g. a flex/grid
+     class) otherwise beats the UA [hidden]{display:none} default, so a
+     toggled-hidden element can render anyway. Force it everywhere. */
+  [hidden] { display: none !important; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Bricolage Grotesque', 'Figtree', sans-serif;
+    font-weight: 700;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  button { font-family: inherit; }
+
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  a { color: inherit; }
+
+  /* ---------- Shell ---------- */
+
+  .app {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px 64px;
+    position: relative;
+  }
+
+  header.hero {
+    padding: 36px 4px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .brandline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brandmark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4A6CF7, #8B5CF6);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-shadow: 0 0 18px rgba(139, 108, 255, 0.55);
+  }
+
+  .brandmark svg { width: 22px; height: 22px; }
+
+  .brandline h1 {
+    font-size: clamp(1.5rem, 5vw, 1.9rem);
+    letter-spacing: -0.01em;
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 0.98rem;
+    max-width: 46ch;
+    line-height: 1.5;
+  }
+
+  .tagline strong { color: var(--ink-soft); font-weight: 600; }
+
+  /* ---------- Progress hero: ring + level + motivational line ---------- */
+
+  .progress-hero {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: linear-gradient(135deg, var(--hero-a), var(--hero-b), var(--hero-c));
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-top: 6px;
+  }
+
+  .ring-wrap {
+    position: relative;
+    width: 92px;
+    height: 92px;
+    flex: none;
+  }
+
+  .progress-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+  .ring-track {
+    fill: none;
+    stroke: hsl(var(--shadow) / 0.12);
+    stroke-width: 10;
+  }
+
+  .ring-fill {
+    fill: none;
+    stroke: url(#ringGrad);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 326.7;
+    stroke-dashoffset: 326.7;
+    transition: stroke-dashoffset 0.6s cubic-bezier(.2,.9,.3,1);
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 70%, transparent));
+  }
+
+  .ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ring-num {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1.7rem;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .ring-den {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.66rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .progress-side { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+  .level-pill {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--paper-raised), color-mix(in srgb, var(--accent) 10%, var(--paper-raised)));
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 12px 5px 8px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--ink);
+  }
+
+  .motivate {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  .mini-stats { display: flex; gap: 14px; margin-top: 2px; }
+
+  .mini-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .mini-stat small { font-family: 'Figtree', sans-serif; font-weight: 500; font-size: 0.68rem; color: var(--muted); }
+
+  .ms-icon { font-size: 0.9rem; }
+  .ms-icon.pulse { animation: flamePulse 1.6s ease-in-out infinite; }
+
+  @keyframes flamePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+  }
+
+  @media (max-width: 420px) {
+    .progress-hero { gap: 14px; padding: 16px; }
+    .ring-wrap { width: 78px; height: 78px; }
+    .ring-num { font-size: 1.4rem; }
+  }
+
+  /* ---------- Route map ---------- */
+
+  .route {
+    position: relative;
+    margin-top: 28px;
+    padding-left: 46px;
+  }
+
+  .route::before {
+    content: "";
+    position: absolute;
+    left: 21px;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--line) 0 10px,
+      transparent 10px 18px
+    );
+    border-radius: 3px;
+  }
+
+  .stop {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .stop-btn {
+    all: unset;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    cursor: pointer;
+    box-shadow: inset 4px 0 0 color-mix(in srgb, var(--u-color, var(--line)) 60%, transparent);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .stop-btn:hover { border-color: var(--u-color, var(--accent)); }
+  .stop-btn:active { transform: scale(0.99); }
+
+  .node {
+    position: absolute;
+    left: -46px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--u-color, var(--line)) 30%, var(--paper)), color-mix(in srgb, var(--u-color, var(--line)) 12%, var(--paper)));
+    border: 3px solid color-mix(in srgb, var(--u-color, var(--line)) 55%, var(--paper));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: var(--ink);
+    z-index: 1;
+  }
+
+  .node.has-progress {
+    border-color: var(--u-color, var(--accent));
+    background: linear-gradient(135deg, color-mix(in srgb, var(--u-color, var(--accent)) 42%, var(--paper)), color-mix(in srgb, var(--u-color, var(--accent)) 20%, var(--paper)));
+  }
+  .node.complete {
+    border-color: var(--good);
+    background: linear-gradient(135deg, var(--good), color-mix(in srgb, var(--good) 60%, var(--accent)));
+    color: #FFFFFF;
+    font-size: 1.1rem;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--good) 50%, transparent);
+  }
+
+  .stop-info { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+  .stop-info .en {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stop-info .tr {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .stop-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex: none;
+    width: 56px;
+  }
+
+  .mini-bar {
+    width: 56px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .mini-bar .mini-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--u-color, var(--accent)), color-mix(in srgb, var(--u-color, var(--accent)) 55%, var(--star)));
+    transition: width 0.4s ease;
+  }
+
+  .mini-bar .mini-fill.complete { background: linear-gradient(90deg, var(--good), color-mix(in srgb, var(--good) 55%, var(--accent))); }
+
+  .stop-progress .pct {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .finish {
+    position: relative;
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: var(--paper-raised);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-md);
+    color: var(--muted);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .finish .node {
+    position: static;
+    transform: none;
+    border-style: dashed;
+  }
+
+  /* ---------- Unit panel ---------- */
+
+  .panel-backdrop {
+    position: fixed;
+    inset: 0;
+    background: hsl(var(--shadow) / 0.45);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 20;
+  }
+
+  .panel-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .panel {
+    position: fixed;
+    right: 0; left: 0; bottom: 0;
+    top: 4vh;
+    background: var(--paper);
+    border-radius: 24px 24px 0 0;
+    z-index: 21;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(.2,.9,.3,1);
+    max-width: 720px;
+    margin: 0 auto;
+    overflow: hidden;
+    box-shadow: 0 -10px 40px hsl(var(--shadow) / 0.25);
+  }
+
+  .panel.open { transform: translateY(0); }
+
+  @media (min-width: 760px) {
+    .panel { top: 6vh; bottom: 6vh; border-radius: 24px; }
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid var(--line);
+    flex: none;
+  }
+
+  .panel-head h2 { font-size: 1.3rem; }
+  .panel-head .tr { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+
+  .unit-progress {
+    padding: 14px 20px 0;
+    flex: none;
+  }
+
+  .unit-progress .bar {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .unit-progress .fill {
+    height: 100%;
+    width: 0%;
+    background: var(--good);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  .unit-progress .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 8px;
+  }
+
+  .unit-progress .pct {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--good);
+  }
+
+  .unit-progress .frac {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .close-btn {
+    all: unset;
+    box-sizing: border-box;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex: none;
+  }
+  .close-btn:hover { border-color: var(--accent); }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 12px 20px 0;
+    flex: none;
+    overflow-x: auto;
+  }
+
+  .tab {
+    all: unset;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .tab.active { background: var(--accent); color: var(--accent-ink); }
+
+  .panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px 32px;
+  }
+
+  /* word list — each row is marked with the student's own progress */
+  .wordlist { display: flex; flex-direction: column; gap: 10px; }
+
+  .word-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--paper-raised);
+  }
+  .word-row.status-known { border-left-color: var(--good); background: var(--good-soft); }
+  .word-row.status-review { border-left-color: var(--bad); background: var(--bad-soft); }
+
+  .word-row .row-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .word-row .left-group { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .word-row .en { font-weight: 600; }
+  .word-row .right-group { display: flex; align-items: center; gap: 8px; flex: none; }
+  .word-row .tr { color: var(--muted); text-align: right; }
+  .word-row .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .word-row .badge.new { background: var(--line); color: var(--muted); }
+  .word-row .badge.review { background: var(--bad-soft); color: var(--bad); }
+  .word-row .badge.known { background: var(--good-soft); color: var(--good); }
+  .word-row .ex { font-size: 0.82rem; color: var(--muted); font-style: italic; }
+
+  /* flashcards */
+  .fc-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .fc-progress {
+    align-self: stretch;
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .card-stage {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 3/2;
+    perspective: 1200px;
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(.2,.9,.3,1);
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    gap: 10px;
+  }
+
+  .face.front .word { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.5rem, 6vw, 2.1rem); font-weight: 700; }
+  .face.front .hint { color: var(--muted); font-size: 0.82rem; }
+
+  .face.back {
+    transform: rotateY(180deg);
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+  }
+  .face.back .tr-word { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.3rem, 5vw, 1.7rem); font-weight: 700; }
+  .face.back .sentence { font-size: 0.92rem; opacity: 0.92; max-width: 32ch; }
+
+  .fc-actions { display: flex; gap: 10px; width: 100%; max-width: 420px; }
+
+  .btn {
+    all: unset;
+    box-sizing: border-box;
+    flex: 1;
+    text-align: center;
+    padding: 13px 10px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    border: 1px solid var(--line);
+  }
+
+  .btn.again { color: var(--bad); background: var(--bad-soft); border-color: transparent; }
+  .btn.know { color: var(--good); background: var(--good-soft); border-color: transparent; }
+  .btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--star));
+    color: var(--accent-ink);
+    border-color: transparent;
+    box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  .btn:active { transform: scale(0.98); }
+
+  /* quiz */
+  .quiz-wrap { display: flex; flex-direction: column; gap: 18px; }
+
+  .quiz-progress {
+    height: 6px;
+    border-radius: 4px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .quiz-progress .fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s ease; }
+
+  .quiz-q {
+    text-align: center;
+    padding: 10px 0 4px;
+  }
+  .quiz-q .eyebrow { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .quiz-q .word { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.6rem, 7vw, 2.2rem); margin-top: 6px; }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .opt {
+    all: unset;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    cursor: pointer;
+    font-size: 0.98rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .opt:hover { border-color: var(--accent); }
+  .opt.correct { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+  .opt.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+  .opt[disabled] { pointer-events: none; }
+
+  .quiz-result {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 0;
+  }
+  .quiz-result .big { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2.4rem; }
+  .quiz-result .sub { color: var(--muted); }
+
+  .empty-note {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-size: 0.95rem;
+  }
+
+  /* speaker / pronunciation button */
+  .speak-btn {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    color: var(--accent);
+    cursor: pointer;
+    flex: none;
+  }
+  .speak-btn:hover { border-color: var(--accent); }
+  .speak-btn:active { transform: scale(0.95); }
+  .face.front .speak-btn { position: absolute; top: 14px; right: 14px; background: var(--paper); }
+  .face.back .speak-btn { display: none; }
+  .quiz-q .speak-btn { margin: 8px auto 0; }
+  .word-row .speak-btn { width: 26px; height: 26px; }
+  .word-row .row-top { position: relative; }
+
+  /* write-mode (typed answer) */
+  .write-sentence {
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    padding: 0 6px;
+  }
+  .write-sentence b { color: var(--accent); font-weight: 700; letter-spacing: 0.02em; }
+
+  .write-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-size: 1rem;
+    font-family: inherit;
+  }
+  .write-input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+  .write-input.correct { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+  .write-input.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+  .write-input[disabled] { opacity: 1; }
+
+  .write-feedback { text-align: center; font-size: 0.88rem; font-weight: 600; min-height: 1.2em; }
+  .write-feedback.correct { color: var(--good); }
+  .write-feedback.wrong { color: var(--bad); }
+
+  /* badges */
+  .badge-trigger {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    align-self: flex-start;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--star-soft), color-mix(in srgb, var(--accent) 18%, var(--star-soft)));
+    border: 1px solid transparent;
+    color: var(--star);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .badge-trigger:hover { border-color: var(--star); transform: translateY(-1px); }
+  .badge-trigger:active { transform: scale(0.97); }
+
+  .sheet-modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -46%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.25s ease;
+    width: min(92vw, 480px);
+    max-height: 78vh;
+    background: var(--paper);
+    border-radius: 24px;
+    z-index: 21;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px hsl(var(--shadow) / 0.35);
+  }
+  .sheet-modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+  .sheet-modal .panel-body { display: flex; flex-direction: column; gap: 22px; }
+
+  /* header icon buttons (settings, etc.) */
+  .icon-btn {
+    all: unset;
+    box-sizing: border-box;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--star-soft), var(--paper-raised));
+    border: 1px solid var(--line);
+    color: var(--star);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: none;
+    box-shadow: 0 2px 8px hsl(var(--shadow) / 0.14);
+    transition: transform 0.25s cubic-bezier(.2,.9,.3,1), box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .icon-btn:hover {
+    border-color: var(--star);
+    transform: rotate(35deg);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--star) 55%, transparent);
+  }
+  .icon-btn:active { transform: rotate(35deg) scale(0.9); }
+
+  /* settings sheet */
+  .settings-block { display: flex; flex-direction: column; gap: 10px; }
+  .settings-block .settings-label { font-weight: 700; font-size: 0.9rem; }
+  .settings-block .settings-help { font-size: 0.78rem; color: var(--muted); line-height: 1.4; margin-top: -4px; }
+
+  .segmented {
+    display: flex;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 3px;
+  }
+  .segmented button {
+    all: unset;
+    box-sizing: border-box;
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .segmented button.active { background: var(--accent); color: var(--accent-ink); }
+
+  .switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .switch-row .settings-label { font-size: 0.9rem; }
+
+  .switch {
+    all: unset;
+    box-sizing: border-box;
+    width: 46px;
+    height: 27px;
+    border-radius: 999px;
+    background: var(--line);
+    position: relative;
+    cursor: pointer;
+    flex: none;
+    transition: background 0.2s ease;
+  }
+  .switch::before {
+    content: "";
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 21px; height: 21px;
+    border-radius: 50%;
+    background: var(--paper-raised);
+    box-shadow: 0 1px 3px hsl(var(--shadow) / 0.4);
+    transition: transform 0.2s ease;
+  }
+  .switch.on { background: var(--accent); }
+  .switch.on::before { transform: translateX(19px); }
+
+  .settings-actions { display: flex; flex-direction: column; gap: 10px; }
+  .settings-actions .btn { width: 100%; }
+  .btn.ghost { background: var(--paper-raised); color: var(--ink-soft); border: 1px solid var(--line); }
+  .btn.danger { background: var(--bad-soft); color: var(--bad); border: 1px solid transparent; }
+
+  /* eksikler (weak-word) tile — always present, not conditional */
+  .weak-tile {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+  }
+  .weak-tile.has-items { border-color: var(--bad); background: var(--bad-soft); }
+  .weak-tile .msg { font-size: 0.9rem; color: var(--muted); line-height: 1.4; }
+  .weak-tile.has-items .msg { color: var(--bad); }
+  .weak-tile .msg strong { font-family: 'IBM Plex Mono', monospace; }
+  .weak-tile button {
+    all: unset;
+    box-sizing: border-box;
+    background: var(--line);
+    color: var(--muted);
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    flex: none;
+  }
+  .weak-tile.has-items button { background: var(--bad); color: var(--bad-ink); cursor: pointer; }
+
+  .resume-note {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .restart-link {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    gap: 12px;
+  }
+  .badge-tile {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    background: var(--paper-raised);
+  }
+  .badge-tile.locked { opacity: 0.45; }
+  .badge-tile .icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--star-soft);
+    color: var(--star);
+  }
+  .badge-tile.locked .icon { background: var(--line); color: var(--muted); }
+  .badge-tile .name { font-weight: 700; font-size: 0.82rem; }
+  .badge-tile .desc { font-size: 0.7rem; color: var(--muted); line-height: 1.3; }
+
+  .badge-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 20px);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--paper-raised);
+    border: 1px solid var(--star);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    box-shadow: 0 12px 30px hsl(var(--shadow) / 0.3);
+    z-index: 40;
+    max-width: 90vw;
+  }
+  .badge-toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .badge-toast .badge-toast-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--star-soft); color: var(--star);
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .badge-toast strong { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .badge-toast div div { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 0.95rem; }
+
+  footer.credit {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-top: 30px;
+    padding: 0 10px;
+    line-height: 1.6;
+  }
+
+  /* ---------- Sınıfa katılma ekranı (bulut modu açıkken ilk giriş) ---------- */
+  .gate-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .gate-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 30px 24px 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+  }
+  .gate-card h2 { font-size: 1.3rem; margin-top: 12px; }
+  .gate-card .tagline { margin: 2px 0 14px; max-width: none; }
+  .gate-card .write-input { width: 100%; text-align: center; margin-top: 8px; }
+  .gate-card .btn.primary { width: 100%; margin-top: 14px; }
+  .gate-card .write-feedback { min-height: 1.2em; margin-top: 6px; }
+  .gate-card .gate-loading { color: var(--muted); font-size: 0.85rem; margin-top: 10px; }
+
+  .account-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .account-row .who { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+  .account-row .who .name { font-weight: 700; font-size: 0.92rem; }
+  .account-row .who .cls { font-size: 0.78rem; color: var(--muted); }
+</style>
+
+<div class="app">
+  <header class="hero">
+    <div class="brandline">
+      <div class="brandmark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="12 7 15 12 12 17 9 12"/></svg>
+      </div>
+      <h1>Kelime Rotası</h1>
+      <button class="icon-btn" id="settingsTrigger" type="button" aria-label="Ayarlar" style="margin-left:auto;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.04z"/></svg>
+      </button>
+    </div>
+    <div class="progress-hero">
+      <div class="ring-wrap">
+        <svg class="progress-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:var(--accent)"/>
+              <stop offset="55%" style="stop-color:var(--star)"/>
+              <stop offset="100%" style="stop-color:var(--good)"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-track" cx="60" cy="60" r="52"/>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-num" id="statMastered">0</div>
+          <div class="ring-den">/ 140</div>
+        </div>
+      </div>
+      <div class="progress-side">
+        <div class="level-pill" id="levelPill"><span id="levelIcon">🧭</span><span id="levelTitle">Çırak Kaşif</span></div>
+        <p class="motivate" id="motivateText">Yolculuğuna başlamaya hazır mısın?</p>
+        <div class="mini-stats">
+          <div class="mini-stat"><span class="ms-icon" id="streakIcon">🔥</span><span id="statStreak">0</span><small>gün seri</small></div>
+          <div class="mini-stat"><span class="ms-icon">⭐</span><span id="statPoints">0</span><small>puan</small></div>
+        </div>
+      </div>
+    </div>
+    <button class="badge-trigger" id="badgeTrigger" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M9 13.5 7 22l5-3 5 3-2-8.5"/></svg>
+      <span id="badgeTriggerText">Rozetler 0/9</span>
+    </button>
+    <div class="weak-tile" id="weakTile"></div>
+  </header>
+
+  <nav class="route" id="route" aria-label="Üniteler"></nav>
+
+  <div class="finish">
+    <div class="node" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18"/><path d="M5 4h11l-2 3.5L16 11H5"/></svg>
+    </div>
+    <span>10 durağı da tamamla, LGS İngilizce'ye kelime hazinen ile gir.</span>
+  </div>
+
+  <footer class="credit" id="footerCredit">Kelime Rotası &middot; MEB 8. sınıf İngilizce müfredatı ünitelerine göre hazırlanmıştır &middot; İlerlemen bu cihazda saklanır.</footer>
+</div>
+
+<div class="gate-screen" id="gateScreen" hidden>
+  <div class="gate-card">
+    <div class="brandmark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="12 7 15 12 12 17 9 12"/></svg>
+    </div>
+    <h2>Sınıfına Katıl</h2>
+    <p class="tagline">Öğretmeninin sana verdiği sınıf kodunu ve adını yaz, ilerlemen bu sınıfa kaydedilsin.</p>
+    <input class="write-input" id="gateCode" placeholder="Sınıf kodu (ör. AB3K9P)" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="6">
+    <input class="write-input" id="gateName" placeholder="Adın" autocomplete="off" maxlength="40">
+    <div class="write-feedback wrong" id="gateError"></div>
+    <button class="btn primary" id="gateSubmit" type="button">Katıl</button>
+    <div class="gate-loading" id="gateLoading" hidden>Bağlanıyor…</div>
+  </div>
+</div>
+
+<div class="panel-backdrop" id="backdrop"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
+  <div class="panel-head">
+    <div>
+      <h2 id="panelTitle">—</h2>
+      <div class="tr" id="panelSubtitle">—</div>
+    </div>
+    <button class="close-btn" id="closePanel" aria-label="Kapat">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+    </button>
+  </div>
+  <div class="unit-progress" id="unitProgress">
+    <div class="bar"><div class="fill" id="upFill"></div></div>
+    <div class="meta"><span class="pct" id="upPct">0%</span><span class="frac" id="upFrac">0/0 kelime öğrenildi</span></div>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab" data-tab="cards">Kelime Kartları</button>
+    <button class="tab" data-tab="quiz">Hızlı Sınav</button>
+    <button class="tab" data-tab="write">Yazarak Test</button>
+    <button class="tab" data-tab="list">Kelime Listesi</button>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+</div>
+
+<div class="panel-backdrop" id="badgeBackdrop"></div>
+<div class="sheet-modal" id="badgeSheet" role="dialog" aria-modal="true" aria-labelledby="badgeSheetTitle">
+  <div class="panel-head">
+    <div>
+      <h2 id="badgeSheetTitle">Rozetlerim</h2>
+      <div class="tr" id="badgeSheetSub">0/9 rozet kazanıldı</div>
+    </div>
+    <button class="close-btn" id="closeBadges" aria-label="Kapat">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+    </button>
+  </div>
+  <div class="panel-body" id="badgeGrid"></div>
+</div>
+
+<div class="panel-backdrop" id="settingsBackdrop"></div>
+<div class="sheet-modal" id="settingsSheet" role="dialog" aria-modal="true" aria-labelledby="settingsSheetTitle">
+  <div class="panel-head">
+    <div>
+      <h2 id="settingsSheetTitle">Ayarlar</h2>
+      <div class="tr">Görünüm, ses ve ilerleme</div>
+    </div>
+    <button class="close-btn" id="closeSettings" aria-label="Kapat">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+    </button>
+  </div>
+  <div class="panel-body">
+    <div class="settings-block">
+      <div class="settings-label">Tema</div>
+      <div class="segmented" id="themeSegmented">
+        <button data-theme-choice="system" type="button">Sistem</button>
+        <button data-theme-choice="light" type="button">Açık</button>
+        <button data-theme-choice="dark" type="button">Koyu</button>
+      </div>
+    </div>
+    <div class="settings-block">
+      <div class="switch-row">
+        <span class="settings-label">Sesli telaffuz</span>
+        <button class="switch" id="speechSwitch" type="button" aria-pressed="true"></button>
+      </div>
+      <div class="settings-help">Kelime kartlarında, sınavda ve listede hoparlör ikonuyla İngilizce telaffuzu dinleme.</div>
+    </div>
+    <div class="settings-block" id="accountBlock" hidden>
+      <div class="settings-label">Hesap</div>
+      <div class="account-row">
+        <div class="who">
+          <span class="name" id="accountName">—</span>
+          <span class="cls" id="accountClass">—</span>
+        </div>
+      </div>
+      <button class="btn ghost" id="leaveClassBtn" type="button">Farklı Sınıfa Katıl</button>
+      <div class="settings-actions" id="leaveConfirm" hidden>
+        <div class="settings-help" style="color:var(--bad);">Bu cihazdaki bağlantı sıfırlanacak ve yeni bir sınıf koduyla tekrar katılman gerekecek. Emin misin?</div>
+        <button class="btn danger" id="leaveConfirmYes" type="button">Evet, Ayrıl</button>
+        <button class="btn ghost" id="leaveConfirmNo" type="button">Vazgeç</button>
+      </div>
+    </div>
+    <div class="settings-block">
+      <div class="settings-label">İlerleme</div>
+      <div class="settings-help" id="progressHelp">İlerlemen bu cihazda/tarayıcıda saklanıyor. Başka bir cihaza taşımak ya da yedeklemek için indir, geri yüklemek için yükle.</div>
+      <div class="settings-actions">
+        <button class="btn ghost" id="exportBtn" type="button">İlerlemeyi Yedekle (İndir)</button>
+        <div id="manualBackup" hidden>
+          <div class="settings-help">İndirme bu görünümde desteklenmiyor. Aşağıdaki metne dokun, tamamını seç ve kopyala, sonra bir notta sakla:</div>
+          <textarea class="write-input" id="backupText" readonly rows="4" style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;resize:vertical;margin-top:6px;"></textarea>
+        </div>
+        <button class="btn ghost" id="importBtn" type="button">Yedekten Geri Yükle</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+        <div class="settings-help" id="importStatus"></div>
+        <button class="btn danger" id="resetBtn" type="button">İlerlemeyi Sıfırla</button>
+        <div class="settings-actions" id="resetConfirm" hidden>
+          <div class="settings-help" style="color:var(--bad);">Tüm ilerleme (kelimeler, puan, rozetler, seri) kalıcı olarak silinecek. Emin misin?</div>
+          <button class="btn danger" id="resetConfirmYes" type="button">Evet, Sıfırla</button>
+          <button class="btn ghost" id="resetConfirmNo" type="button">Vazgeç</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Bulut bağlantısı (Supabase) ---------------- */
+  // config.js dolu doldurulmamış fark etmeksizin uygulama çalışır: anahtarlar
+  // hâlâ placeholder ise (veya config.js hiç yüklenmediyse) her şey eskisi
+  // gibi sadece bu cihazda/localStorage'da saklanır — "çevrimdışı mod".
+  // Gerçek bir Supabase projesi bağlanınca öğrencinin ilerlemesi ayrıca
+  // buluta senkronize olur ve öğretmen panelinde görünür.
+  var CFG = window.KELIME_ROTASI_CONFIG || {};
+  var cloudEnabled = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY &&
+    CFG.SUPABASE_URL.indexOf("YOUR-PROJECT") === -1 &&
+    CFG.SUPABASE_ANON_KEY.indexOf("YOUR-ANON-KEY") === -1 &&
+    window.supabase);
+  var supa = cloudEnabled ? window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY) : null;
+  var studentMeta = null; // { id, classId, name } — dolar dolmaz senkronizasyon başlar
+  var STUDENT_META_KEY = "kr-student-meta";
+
+  /* ---------------- Data: LGS 8. Sınıf İngilizce üniteleri ---------------- */
+
+  var UNITS = [
+    { id: 1, en: "Friendship", tr: "Arkadaşlık", words: [
+      ["caring","şefkatli, ilgili","A good friend is caring and always listens to you."],
+      ["understanding","anlayışlı","She is very understanding when I make a mistake."],
+      ["honest","dürüst","A true friend is always honest with you."],
+      ["generous","cömert","He is generous; he shares everything with his friends."],
+      ["selfish","bencil","A selfish friend only thinks about himself."],
+      ["jealous","kıskanç","Don't be jealous of your friend's success."],
+      ["supportive","destekleyici","My best friend is supportive in hard times."],
+      ["sincere","samimi","I like her because she is sincere and warm."],
+      ["broad-minded","açık görüşlü","A broad-minded friend respects different opinions."],
+      ["narrow-minded","dar görüşlü","He is narrow-minded and never listens to new ideas."],
+      ["easy-going","uyumlu, rahat","My friend is easy-going, so we never argue."],
+      ["hot-tempered","çabuk sinirlenen","He is hot-tempered, so be careful what you say."],
+      ["trustworthy","güvenilir","You can tell her your secret; she is trustworthy."],
+      ["considerate","düşünceli","A considerate friend thinks about your feelings first."]
+    ]},
+    { id: 2, en: "Teen Life", tr: "Genç Yaşamı", words: [
+      ["curfew","eve dönüş saati","My curfew is nine o'clock on school nights."],
+      ["allowance","harçlık","I save half of my weekly allowance."],
+      ["peer pressure","akran baskısı","Don't do things just because of peer pressure."],
+      ["part-time job","yarı zamanlı iş","My cousin has a part-time job at a bookstore."],
+      ["responsibility","sorumluluk","Teenagers should learn responsibility step by step."],
+      ["independence","bağımsızlık","Teens want more independence from their parents."],
+      ["curious","meraklı","Teenagers are curious about the world around them."],
+      ["social media","sosyal medya","She spends too much time on social media."],
+      ["relationship","ilişki","A good relationship needs trust and honesty."],
+      ["hang out","takılmak, vakit geçirmek","We usually hang out at the park after school."],
+      ["text message","kısa mesaj","I sent her a text message about the homework."],
+      ["video game","video oyunu","He plays a video game every evening."],
+      ["generation gap","kuşak farkı","There is a generation gap between him and his grandfather."],
+      ["deadline","son teslim tarihi","The deadline for the project is Friday."]
+    ]},
+    { id: 3, en: "In the Kitchen", tr: "Mutfakta", words: [
+      ["boil","kaynatmak","Boil the water before adding the pasta."],
+      ["fry","kızartmak","She likes to fry eggs for breakfast."],
+      ["bake","fırında pişirmek","We bake a cake every Sunday."],
+      ["chop","doğramak","Chop the onions into small pieces."],
+      ["peel","soymak","Peel the potatoes before boiling them."],
+      ["grate","rendelemek","Grate the cheese over the pasta."],
+      ["mix","karıştırmak","Mix the flour and sugar in a bowl."],
+      ["ingredient","malzeme","Flour is the main ingredient in bread."],
+      ["recipe","tarif","This recipe needs three eggs."],
+      ["slice","dilimlemek","Slice the bread before serving it."],
+      ["pour","dökmek","Pour the milk into the glass."],
+      ["spoonful","kaşık dolusu","Add a spoonful of sugar to the tea."],
+      ["pinch of salt","bir tutam tuz","Add a pinch of salt to the soup."],
+      ["oven","fırın","Put the tray into the hot oven."]
+    ]},
+    { id: 4, en: "On the Phone", tr: "Telefonda", words: [
+      ["hold on","hatta kal, bekle","Can you hold on? I will check the calendar."],
+      ["hang up","telefonu kapatmak","Please don't hang up, I need to tell you something."],
+      ["wrong number","yanlış numara","Sorry, I think you have the wrong number."],
+      ["voicemail","sesli mesaj","Leave me a voicemail if I don't answer."],
+      ["text back","mesajla geri dönmek","I will text back as soon as I'm free."],
+      ["missed call","cevapsız arama","You have three missed calls from your mum."],
+      ["dial","numara çevirmek","Dial the number slowly, please."],
+      ["answer the phone","telefona bakmak","Can you answer the phone? I'm busy right now."],
+      ["busy line","meşgul hat","I called twice, but I got a busy line."],
+      ["leave a message","mesaj bırakmak","You can leave a message after the beep."],
+      ["speak up","yüksek sesle konuşmak","Could you speak up? I can't hear you well."],
+      ["reception","çekim, sinyal","The reception is very weak in the mountains."],
+      ["contact","kişi, irtibat","Save my number as a new contact."],
+      ["charger","şarj aleti","My phone is dead; I forgot my charger."]
+    ]},
+    { id: 5, en: "The Internet", tr: "İnternet", words: [
+      ["download","indirmek","Download the file before you open it."],
+      ["upload","yüklemek","I upload my homework to the school website every week."],
+      ["browse","gezinmek","She likes to browse the internet for new recipes."],
+      ["password","şifre","Never share your password with strangers."],
+      ["website","web sitesi","This website has a lot of useful information."],
+      ["search engine","arama motoru","I used a search engine to find the answer."],
+      ["attachment","ek dosya","Please check the attachment in my e-mail."],
+      ["virus","virüs","This programme protects your computer from a virus."],
+      ["firewall","güvenlik duvarı","A firewall blocks dangerous connections."],
+      ["online","çevrimiçi","She is online now; let's message her."],
+      ["offline","çevrimdışı","The app also works offline."],
+      ["surf the net","internette gezinmek","He likes to surf the net in his free time."],
+      ["social network","sosyal ağ","They met through a social network."],
+      ["cyberbullying","siber zorbalık","Cyberbullying is a serious problem for teenagers."]
+    ]},
+    { id: 6, en: "Adventures", tr: "Maceralar", words: [
+      ["rock climbing","kaya tırmanışı","Rock climbing needs a lot of strength."],
+      ["bungee jumping","bungee atlayışı","I would never try bungee jumping!"],
+      ["scuba diving","tüplü dalış","We went scuba diving in the Red Sea."],
+      ["hiking","doğa yürüyüşü","Hiking in the mountains is my favourite hobby."],
+      ["camping","kamp yapmak","We are going camping by the lake this weekend."],
+      ["thrilling","heyecan verici","Skydiving is a thrilling experience."],
+      ["risky","riskli","Climbing without a guide is too risky."],
+      ["courage","cesaret","It takes courage to try something new."],
+      ["survive","hayatta kalmak","They learned how to survive in the forest."],
+      ["explore","keşfetmek","We want to explore the old castle."],
+      ["wilderness","vahşi doğa","The wilderness is home to many wild animals."],
+      ["adventurous","maceraperest","My uncle is an adventurous traveller."],
+      ["challenge","meydan okuma, zorluk","Climbing the hill was a real challenge."],
+      ["paragliding","yamaç paraşütü","They tried paragliding over the valley."]
+    ]},
+    { id: 7, en: "Tourism", tr: "Turizm", words: [
+      ["accommodation","konaklama","We booked our accommodation near the beach."],
+      ["souvenir","hatıra eşyası","I bought a souvenir for my sister."],
+      ["destination","varış noktası","Paris is a popular tourist destination."],
+      ["itinerary","seyahat planı","Our itinerary includes three cities."],
+      ["sightseeing","gezip görme","We went sightseeing all day in the old town."],
+      ["tour guide","tur rehberi","The tour guide told us about the museum."],
+      ["reservation","rezervasyon","We made a reservation for two nights."],
+      ["luggage","bagaj","Don't forget to label your luggage."],
+      ["landmark","simge yapı","The tower is the city's most famous landmark."],
+      ["cultural heritage","kültürel miras","The old town is part of our cultural heritage."],
+      ["package tour","paket tur","They booked a package tour to Antalya."],
+      ["currency","para birimi","You should exchange currency at the airport."],
+      ["journey","yolculuk","It was a long journey by bus."],
+      ["resort","tatil köyü","We stayed at a resort by the sea."]
+    ]},
+    { id: 8, en: "Chores", tr: "Ev İşleri", words: [
+      ["do the dishes","bulaşık yıkamak","I do the dishes after dinner every night."],
+      ["tidy up","toparlamak","Please tidy up your room before we leave."],
+      ["vacuum","elektrik süpürgesiyle temizlemek","He likes to vacuum the living room on Saturdays."],
+      ["take out the trash","çöpü çıkarmak","Can you take out the trash tonight?"],
+      ["do the laundry","çamaşır yıkamak","My mum has to do the laundry twice a week."],
+      ["water the plants","bitkileri sulamak","I water the plants every morning."],
+      ["sweep the floor","yeri süpürmek","She has to sweep the floor after breakfast."],
+      ["dust the furniture","mobilyaların tozunu almak","I dust the furniture every weekend."],
+      ["make the bed","yatağı toplamak","Always make the bed after you wake up."],
+      ["iron the clothes","ütü yapmak","My dad likes to iron the clothes on Sunday evening."],
+      ["mop the floor","yeri paspaslamak","We mop the floor after cleaning the kitchen."],
+      ["feed the pet","evcil hayvanı beslemek","It's my job to feed the pet every day."],
+      ["set the table","sofrayı kurmak","Can you set the table for dinner?"],
+      ["household duty","ev görevi","Everyone in the family has a household duty."]
+    ]},
+    { id: 9, en: "Science", tr: "Fen Bilimleri", words: [
+      ["experiment","deney","We did an experiment in the science lab."],
+      ["hypothesis","hipotez","Her hypothesis was proven correct."],
+      ["observation","gözlem","Careful observation is the first step in science."],
+      ["laboratory","laboratuvar","The laboratory has all the equipment we need."],
+      ["discover","keşfetmek","Scientists often discover new species in the rainforest."],
+      ["invention","icat","The telephone was an important invention."],
+      ["evidence","kanıt","There is strong evidence for this theory."],
+      ["theory","teori","This theory explains how the universe began."],
+      ["research","araştırma","She is doing research on climate change."],
+      ["scientist","bilim insanı","A scientist must be patient and curious."],
+      ["chemical reaction","kimyasal tepkime","The chemical reaction produced a bright light."],
+      ["measure","ölçmek","We measure the temperature of the water every day."],
+      ["data","veri","The data shows an interesting pattern."],
+      ["analyze","analiz etmek","Scientists analyze the results carefully."]
+    ]},
+    { id: 10, en: "Natural Forces", tr: "Doğal Güçler", words: [
+      ["earthquake","deprem","The earthquake damaged many buildings."],
+      ["flood","sel","Heavy rain caused a flood in the village."],
+      ["drought","kuraklık","The drought lasted for six months."],
+      ["hurricane","kasırga","A hurricane hit the coast last night."],
+      ["volcano","yanardağ","The volcano has been silent for years."],
+      ["avalanche","çığ","An avalanche blocked the mountain road."],
+      ["tsunami","tsunami, dev dalga","The earthquake triggered a huge tsunami."],
+      ["wildfire","orman yangını","The wildfire spread quickly in the dry forest."],
+      ["disaster","felaket","The flood was a natural disaster for the town."],
+      ["eruption","patlama (yanardağ)","The volcano's eruption could be seen from far away."],
+      ["shelter","sığınak","People ran to the shelter during the storm."],
+      ["evacuate","tahliye etmek","The town had to evacuate before the flood."],
+      ["destruction","yıkım","The storm caused great destruction."],
+      ["precaution","önlem","We should take precaution before the storm arrives."]
+    ]}
+  ];
+
+  var TOTAL_WORDS = UNITS.reduce(function (sum, u) { return sum + u.words.length; }, 0);
+
+  // One icon per unit, purely decorative — gives the route list a bit of
+  // personality without touching the underlying unit data.
+  var UNIT_ICONS = {
+    1: "🤝", 2: "🎧", 3: "🍳", 4: "📱", 5: "🌐",
+    6: "🧭", 7: "✈️", 8: "🧹", 9: "🔬", 10: "🌋"
+  };
+
+  // One accent color per unit, cycled if there are ever more units than
+  // colors — turns the route into a varied, colorful path instead of a
+  // flat list. Applied as a CSS custom property per stop; every other
+  // color in the stop (node ring, progress bar, card edge) reads from it.
+  var UNIT_COLORS = [
+    "#FF5D73", "#3E7CFF", "#2FA37E", "#1E9A89", "#9457D6",
+    "#B0459C", "#2FB6C4", "#D6488B", "#4C9F3A", "#7B6CF6"
+  ];
+
+  // Progress "levels" shown in the hero card — purely cosmetic milestones
+  // over totalMasteredCount(), ordered ascending so the last matching
+  // entry wins.
+  var LEVELS = [
+    { min: 0, icon: "🧭", title: "Çırak Kaşif" },
+    { min: 10, icon: "🌱", title: "Filiz Kaşif" },
+    { min: 30, icon: "🚀", title: "Yol Alan Kaşif" },
+    { min: 60, icon: "⚡", title: "Hızlı Kaşif" },
+    { min: 100, icon: "🏆", title: "Usta Kaşif" },
+    { min: 140, icon: "👑", title: "Kelime Şampiyonu" }
+  ];
+
+  function currentLevel(mastered) {
+    var lvl = LEVELS[0];
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (mastered >= LEVELS[i].min) lvl = LEVELS[i];
+    }
+    return lvl;
+  }
+
+  function motivateMessage(mastered, weakCount) {
+    if (mastered >= TOTAL_WORDS) return "Tebrikler! 140 kelimenin tamamını fethettin! 👑";
+    if (mastered === 0) return "Yolculuğuna başlamaya hazır mısın?";
+    if (state.streak >= 3) return state.streak + " günlük serin devam ediyor, harika gidiyorsun! 🔥";
+    if (weakCount > 0) return "Birkaç kelimede daha pratik yapmaya ne dersin?";
+    return "Az kaldı, devam et!";
+  }
+
+  // Milestones the student can unlock. `check` reads live state/progress;
+  // once earned an id is stored permanently in state.badges, even if the
+  // underlying condition would later stop being true (e.g. streak resets).
+  var BADGES = [
+    { id: "first-word", name: "İlk Adım", desc: "İlk kelimeni öğrendin.",
+      check: function () { return totalMasteredCount() >= 1; } },
+    { id: "first-unit", name: "Ünite Ustası", desc: "Birüniteyi tamamen bitirdin.",
+      check: function () { return UNITS.some(function (u) { return unitMasteredCount(u) === u.words.length; }); } },
+    { id: "words-50", name: "50 Kelime", desc: "Toplamda 50 kelime öğrendin.",
+      check: function () { return totalMasteredCount() >= 50; } },
+    { id: "words-100", name: "100 Kelime", desc: "Toplamda 100 kelime öğrendin.",
+      check: function () { return totalMasteredCount() >= 100; } },
+    { id: "all-words", name: "Kelime Şampiyonu", desc: "140 kelimenin tamamını öğrendin.",
+      check: function () { return totalMasteredCount() >= TOTAL_WORDS; } },
+    { id: "streak-3", name: "Ateşli Seri", desc: "3 gün üst üste çalıştın.",
+      check: function () { return state.streak >= 3; } },
+    { id: "streak-7", name: "Azimli", desc: "7 gün üst üste çalıştın.",
+      check: function () { return state.streak >= 7; } },
+    { id: "quiz-perfect", name: "Sınav Ustası", desc: "Bir sınavda hepsini doğru bildin.",
+      check: function () { return !!state.everPerfectQuiz; } },
+    { id: "comeback", name: "Toparlanan", desc: "Yanlış yaptığın bir kelimeyi yeniden öğrendin.",
+      check: function () { return !!state.everComeback; } }
+  ];
+
+  /* ---------------- State (localStorage) ---------------- */
+
+  var STORE_KEY = "kelime-rotasi-v1";
+  var state = loadState();
+
+  function defaultState() {
+    return {
+      words: {}, points: 0, streak: 0, lastDay: null,
+      badges: {}, everPerfectQuiz: false, everComeback: false,
+      theme: "system", speechEnabled: true, lastCardIndex: {}
+    };
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return defaultState();
+      var parsed = JSON.parse(raw);
+      return Object.assign(defaultState(), parsed);
+    } catch (e) {
+      return defaultState();
+    }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+    queueCloudSync();
+  }
+
+  /* ---------------- Bulut senkronizasyonu ---------------- */
+  // Her saveState() çağrısından sonra 1.2sn bekleyip (art arda gelen küçük
+  // güncellemeleri tek istekte toplamak için) öğrencinin puan/seri/rozet
+  // özetini ve kelime bazlı ilerlemesini Supabase'e yazar. İnternet yoksa
+  // sessizce vazgeçer — localStorage zaten güncel, bir sonraki bağlantıda
+  // (bir sonraki saveState tetiklendiğinde) tekrar dener.
+  var cloudSyncTimer = null;
+  function queueCloudSync() {
+    if (!cloudEnabled || !studentMeta) return;
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(pushToCloud, 1200);
+  }
+
+  function pushToCloud() {
+    if (!cloudEnabled || !studentMeta) return;
+    supa.from("students").update({
+      points: state.points,
+      streak: state.streak,
+      last_day: state.lastDay,
+      badges: state.badges,
+      ever_perfect_quiz: !!state.everPerfectQuiz,
+      ever_comeback: !!state.everComeback,
+      last_active: new Date().toISOString()
+    }).eq("id", studentMeta.id).then(function () {});
+
+    var rows = Object.keys(state.words).map(function (k) {
+      var r = state.words[k];
+      return {
+        student_id: studentMeta.id,
+        word_key: k,
+        status: r.status,
+        wrong: r.wrong,
+        consecutive: r.consecutive,
+        updated_at: new Date().toISOString()
+      };
+    });
+    if (rows.length) {
+      supa.from("word_progress").upsert(rows, { onConflict: "student_id,word_key" }).then(function () {});
+    }
+  }
+
+  // Sayfa açılışında: bulut kapalıysa hiçbir şey yapmadan direkt uygulamayı
+  // gösterir. Bulut açıksa, daha önce bir sınıfa katılmış mı diye bakar;
+  // katılmışsa buluttaki güncel ilerlemeyi indirip cihazdakiyle birleştirir,
+  // katılmamışsa "Sınıfına Katıl" ekranını açar.
+  function loadStudentMeta() {
+    try {
+      var raw = localStorage.getItem(STUDENT_META_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  function saveStudentMeta(meta) {
+    studentMeta = meta;
+    try { localStorage.setItem(STUDENT_META_KEY, JSON.stringify(meta)); } catch (e) {}
+  }
+  function clearStudentMeta() {
+    studentMeta = null;
+    try { localStorage.removeItem(STUDENT_META_KEY); } catch (e) {}
+  }
+
+  function hydrateFromCloud() {
+    return supa.from("students").select("*").eq("id", studentMeta.id).single()
+      .then(function (res) {
+        var srow = res.data;
+        if (srow) {
+          state.points = srow.points || 0;
+          state.streak = srow.streak || 0;
+          state.lastDay = srow.last_day || null;
+          state.badges = srow.badges || {};
+          state.everPerfectQuiz = !!srow.ever_perfect_quiz;
+          state.everComeback = !!srow.ever_comeback;
+        }
+        return supa.from("word_progress").select("*").eq("student_id", studentMeta.id);
+      })
+      .then(function (res) {
+        var wrows = res && res.data;
+        if (wrows) {
+          wrows.forEach(function (r) {
+            state.words[r.word_key] = { status: r.status, wrong: r.wrong, consecutive: r.consecutive };
+          });
+        }
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+      })
+      .catch(function () { /* çevrimdışı — cihazdaki mevcut ilerlemeyle devam */ });
+  }
+
+  function showGate(message) {
+    document.getElementById("gateScreen").hidden = false;
+    document.getElementById("gateError").textContent = message || "";
+    document.getElementById("gateLoading").hidden = true;
+  }
+  function hideGate() {
+    document.getElementById("gateScreen").hidden = true;
+  }
+
+  function wireGate() {
+    var codeInput = document.getElementById("gateCode");
+    var nameInput = document.getElementById("gateName");
+    var submitBtn = document.getElementById("gateSubmit");
+    var loading = document.getElementById("gateLoading");
+
+    function submit() {
+      var code = codeInput.value.trim().toUpperCase();
+      var name = nameInput.value.trim();
+      if (!code || !name) { showGate("Lütfen sınıf kodunu ve adını gir."); return; }
+      submitBtn.disabled = true;
+      loading.hidden = false;
+      document.getElementById("gateError").textContent = "";
+
+      supa.rpc("find_class_by_code", { p_code: code }).then(function (res) {
+        if (res.error || !res.data || !res.data.length) {
+          throw new Error("not-found");
+        }
+        var classId = res.data[0].class_id;
+        return supa.auth.signInAnonymously().then(function (authRes) {
+          if (authRes.error || !authRes.data || !authRes.data.user) throw new Error("auth-failed");
+          var studentId = authRes.data.user.id;
+          return supa.from("students").insert({ id: studentId, class_id: classId, name: name })
+            .then(function (insRes) {
+              if (insRes.error) throw new Error("insert-failed");
+              saveStudentMeta({ id: studentId, classId: classId, name: name });
+            });
+        });
+      }).then(function () {
+        return hydrateFromCloud();
+      }).then(function () {
+        hideGate();
+        renderRoute();
+        refreshSettingsUI();
+      }).catch(function (err) {
+        submitBtn.disabled = false;
+        loading.hidden = true;
+        var msg = err && err.message === "not-found"
+          ? "Bu sınıf kodu bulunamadı. Öğretmenine kontrol ettir."
+          : "Bağlantı kurulamadı, tekrar dene.";
+        showGate(msg);
+      });
+    }
+
+    submitBtn.addEventListener("click", submit);
+    [codeInput, nameInput].forEach(function (el) {
+      el.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); submit(); } });
+    });
+  }
+
+  function wireAccountSettings() {
+    var block = document.getElementById("accountBlock");
+    if (!cloudEnabled) { block.hidden = true; return; }
+    block.hidden = false;
+    document.getElementById("progressHelp").textContent =
+      "İlerlemen bu sınıfa bağlı olarak buluta kaydediliyor; başka bir cihazda aynı sınıf koduyla katılırsan devam edebilirsin. Ayrıca burada indirip/yükleyebilirsin.";
+
+    document.getElementById("leaveClassBtn").addEventListener("click", function () {
+      document.getElementById("leaveConfirm").hidden = false;
+    });
+    document.getElementById("leaveConfirmNo").addEventListener("click", function () {
+      document.getElementById("leaveConfirm").hidden = true;
+    });
+    document.getElementById("leaveConfirmYes").addEventListener("click", function () {
+      clearStudentMeta();
+      if (supa) supa.auth.signOut().catch(function () {});
+      window.location.reload();
+    });
+  }
+
+  function refreshAccountUI() {
+    if (!cloudEnabled || !studentMeta) return;
+    document.getElementById("accountName").textContent = studentMeta.name;
+    document.getElementById("accountClass").textContent = "Sınıf kodu ile bağlı";
+    document.getElementById("leaveConfirm").hidden = true;
+  }
+
+  function wordKey(unitId, word) { return unitId + "::" + word; }
+
+  // A word record tracks: status ('new' | 'review' | 'known'), how many times
+  // it has been answered wrong, and a running count of correct answers in a
+  // row since the last mistake (used to decide when a reviewed word is
+  // re-mastered). This is what lets the app show — and let the student
+  // specifically re-practise — the words they actually get wrong.
+  function getRecord(unitId, word) {
+    var key = wordKey(unitId, word);
+    var rec = state.words[key];
+    if (!rec || typeof rec === "string") {
+      rec = { status: rec === "known" ? "known" : "new", wrong: 0, consecutive: rec === "known" ? 2 : 0 };
+      state.words[key] = rec;
+    }
+    return rec;
+  }
+
+  // Flashcard "Biliyorum": an explicit, deliberate self-report — counts as mastered right away.
+  function recordKnow(unitId, word) {
+    var rec = getRecord(unitId, word);
+    var wasReview = rec.status === "review" && rec.wrong > 0;
+    rec.status = "known";
+    rec.consecutive = 2;
+    if (wasReview) state.everComeback = true;
+    saveState();
+  }
+
+  // Flashcard "Tekrar Et" or a wrong quiz answer: flag the word for review.
+  function recordWrong(unitId, word) {
+    var rec = getRecord(unitId, word);
+    rec.status = "review";
+    rec.wrong += 1;
+    rec.consecutive = 0;
+    saveState();
+  }
+
+  // A correct quiz answer: a first-time correct answer masters a new word;
+  // a previously-missed word needs two correct answers in a row to "graduate".
+  function recordQuizCorrect(unitId, word) {
+    var rec = getRecord(unitId, word);
+    var wasReview = rec.status === "review" && rec.wrong > 0;
+    rec.consecutive += 1;
+    if (rec.status === "new" || rec.consecutive >= 2) rec.status = "known";
+    if (wasReview && rec.status === "known") state.everComeback = true;
+    saveState();
+  }
+
+  function isKnown(unitId, word) { return getRecord(unitId, word).status === "known"; }
+  function isReview(unitId, word) { return getRecord(unitId, word).status === "review"; }
+  function wrongCount(unitId, word) { return getRecord(unitId, word).wrong; }
+
+  function addPoints(n) {
+    state.points += n;
+    touchStreak();
+    saveState();
+  }
+
+  function touchStreak() {
+    var today = new Date().toDateString();
+    if (state.lastDay === today) return;
+    var y = new Date(); y.setDate(y.getDate() - 1);
+    state.streak = (state.lastDay === y.toDateString()) ? state.streak + 1 : 1;
+    state.lastDay = today;
+  }
+
+  function unitMasteredCount(unit) {
+    var n = 0;
+    unit.words.forEach(function (w) { if (isKnown(w.length > 3 ? w[3] : unit.id, w[0])) n++; });
+    return n;
+  }
+
+  function totalMasteredCount() {
+    var n = 0;
+    UNITS.forEach(function (u) { n += unitMasteredCount(u); });
+    return n;
+  }
+
+  // The cross-unit list of every word currently flagged for review — this is
+  // the "Zayıf Kelimelerim" pool. Each entry keeps its origin unit id as a
+  // 4th array slot so cards/quiz drawn from this mixed pool still write
+  // progress back to the correct unit.
+  function collectWeakWords() {
+    var list = [];
+    UNITS.forEach(function (u) {
+      u.words.forEach(function (w) {
+        if (isReview(u.id, w[0])) list.push([w[0], w[1], w[2], u.id]);
+      });
+    });
+    return list;
+  }
+
+  function wordUnitId(w) { return w.length > 3 ? w[3] : current.unit.id; }
+
+  /* ---------------- Pronunciation (Web Speech API) ---------------- */
+
+  var canSpeak = "speechSynthesis" in window;
+  var voiceCache = [];
+
+  // Voice lists load async on most browsers (Android Chrome especially) —
+  // grab whatever is available now and refresh when the browser tells us
+  // more voices are ready.
+  function refreshVoices() {
+    if (canSpeak) voiceCache = window.speechSynthesis.getVoices();
+  }
+  if (canSpeak) {
+    refreshVoices();
+    window.speechSynthesis.onvoiceschanged = refreshVoices;
+  }
+
+  // Without an explicit voice, some devices fall back to the system's
+  // default (often the phone's own language) and butcher English words —
+  // this is what "telaffuz kötü" was actually pointing at. Picking a real
+  // English voice by hand, preferring the higher-quality online/Google
+  // ones Chrome ships, fixes that.
+  function pickEnglishVoice() {
+    if (!voiceCache.length) refreshVoices();
+    var en = voiceCache.filter(function (v) { return /^en[-_]/i.test(v.lang); });
+    if (!en.length) return null;
+    return en.find(function (v) { return /en-US/i.test(v.lang) && /Google|Natural|Online|Neural/i.test(v.name); }) ||
+           en.find(function (v) { return /en-US/i.test(v.lang); }) ||
+           en.find(function (v) { return /en-GB/i.test(v.lang); }) ||
+           en[0];
+  }
+
+  function speechAllowed() { return canSpeak && state.speechEnabled !== false; }
+
+  function speak(text) {
+    if (!speechAllowed()) return;
+    try {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var voice = pickEnglishVoice();
+      if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = "en-US"; }
+      u.rate = 0.95;
+      u.pitch = 1;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  function speakerBtnHtml(text) {
+    if (!speechAllowed()) return "";
+    return '<button type="button" class="speak-btn" data-speak="' + text.replace(/"/g, "&quot;") + '" aria-label="Kelimeyi dinle">' +
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 9 3 15 8 15 13 20 13 4 8 9 3 9"/><path d="M16 8a5 5 0 0 1 0 8"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>' +
+      '</button>';
+  }
+
+  // Wires every .speak-btn under `root` to speak its data-speak text,
+  // stopping the click from bubbling to whatever else sits under it
+  // (a flashcard's own flip handler, most importantly).
+  function wireSpeakButtons(root) {
+    if (!canSpeak) return;
+    Array.prototype.forEach.call(root.querySelectorAll(".speak-btn"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        speak(btn.getAttribute("data-speak"));
+      });
+    });
+  }
+
+  /* ---------------- Fill-in-the-blank helper ---------------- */
+
+  function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function blankSentence(sentence, word) {
+    var re = new RegExp(escapeRegex(word), "i");
+    return sentence.replace(re, "<b>_____</b>");
+  }
+
+  /* ---------------- Badges ---------------- */
+
+  function badgeIconSvg() {
+    return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M9 13.5 7 22l5-3 5 3-2-8.5"/></svg>';
+  }
+
+  function checkBadges() {
+    var newly = [];
+    BADGES.forEach(function (b) {
+      if (!state.badges[b.id] && b.check()) {
+        state.badges[b.id] = true;
+        newly.push(b);
+      }
+    });
+    if (newly.length) { saveState(); showBadgeToast(newly); }
+    return newly;
+  }
+
+  function showBadgeToast(badges) {
+    badges.forEach(function (b, i) {
+      setTimeout(function () {
+        var el = document.createElement("div");
+        el.className = "badge-toast";
+        el.innerHTML = '<div class="badge-toast-icon">' + badgeIconSvg() + '</div><div><strong>Yeni rozet</strong><div>' + b.name + "</div></div>";
+        document.body.appendChild(el);
+        requestAnimationFrame(function () { el.classList.add("show"); });
+        setTimeout(function () {
+          el.classList.remove("show");
+          setTimeout(function () { el.remove(); }, 300);
+        }, 3200);
+      }, i * 700);
+    });
+  }
+
+  var badgeBackdrop = document.getElementById("badgeBackdrop");
+  var badgeSheet = document.getElementById("badgeSheet");
+  var badgeTrigger = document.getElementById("badgeTrigger");
+  var badgeTriggerText = document.getElementById("badgeTriggerText");
+
+  function renderBadgeGrid() {
+    var earned = Object.keys(state.badges).length;
+    document.getElementById("badgeSheetSub").textContent = earned + " / " + BADGES.length + " rozet kazanıldı";
+    var html = BADGES.map(function (b) {
+      var got = !!state.badges[b.id];
+      return '<div class="badge-tile' + (got ? "" : " locked") + '"><div class="icon">' + badgeIconSvg() + '</div><div class="name">' + b.name + '</div><div class="desc">' + b.desc + "</div></div>";
+    }).join("");
+    document.getElementById("badgeGrid").innerHTML = '<div class="badge-grid">' + html + "</div>";
+  }
+
+  function openBadges() {
+    renderBadgeGrid();
+    badgeBackdrop.classList.add("open");
+    badgeSheet.classList.add("open");
+  }
+
+  function closeBadges() {
+    badgeBackdrop.classList.remove("open");
+    badgeSheet.classList.remove("open");
+  }
+
+  badgeTrigger.addEventListener("click", openBadges);
+  document.getElementById("closeBadges").addEventListener("click", closeBadges);
+  badgeBackdrop.addEventListener("click", closeBadges);
+
+  /* ---------------- Settings ---------------- */
+
+  function applyTheme() {
+    var t = state.theme || "system";
+    if (t === "system") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", t);
+    Array.prototype.forEach.call(document.querySelectorAll("#themeSegmented button"), function (b) {
+      b.classList.toggle("active", b.dataset.themeChoice === t);
+    });
+  }
+
+  var settingsBackdrop = document.getElementById("settingsBackdrop");
+  var settingsSheet = document.getElementById("settingsSheet");
+  var speechSwitch = document.getElementById("speechSwitch");
+
+  function refreshSettingsUI() {
+    applyTheme();
+    speechSwitch.classList.toggle("on", state.speechEnabled !== false);
+    speechSwitch.setAttribute("aria-pressed", state.speechEnabled !== false ? "true" : "false");
+    document.getElementById("manualBackup").hidden = true;
+    document.getElementById("importStatus").textContent = "";
+    document.getElementById("resetConfirm").hidden = true;
+    refreshAccountUI();
+  }
+
+  function openSettings() { refreshSettingsUI(); settingsBackdrop.classList.add("open"); settingsSheet.classList.add("open"); }
+  function closeSettings() { settingsBackdrop.classList.remove("open"); settingsSheet.classList.remove("open"); }
+
+  document.getElementById("settingsTrigger").addEventListener("click", openSettings);
+  document.getElementById("closeSettings").addEventListener("click", closeSettings);
+  settingsBackdrop.addEventListener("click", closeSettings);
+
+  document.getElementById("themeSegmented").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    state.theme = b.dataset.themeChoice;
+    saveState();
+    applyTheme();
+  });
+
+  speechSwitch.addEventListener("click", function () {
+    state.speechEnabled = state.speechEnabled === false ? true : false;
+    saveState();
+    refreshSettingsUI();
+  });
+
+  // Backup / restore: the artifact viewer's sandbox blocks plain file
+  // downloads, so we ask the platform's downloads capability to save the
+  // file when it's available, and always fall back to an in-page,
+  // copy-able JSON blob that needs no capability and no native dialog
+  // (dialogs like prompt()/alert()/confirm() aren't guaranteed to work
+  // inside a sandboxed viewer, so every one of these flows stays on-page).
+  document.getElementById("exportBtn").addEventListener("click", function () {
+    var payload = JSON.stringify(state, null, 2);
+    if (window.claude && typeof window.claude.use === "function") {
+      window.claude.use("downloads").then(function (downloads) {
+        if (!downloads) { showManualBackup(payload); return; }
+        downloads.save({ filename: "kelime-rotasi-yedek.json", data: payload }).catch(function () {
+          showManualBackup(payload);
+        });
+      }).catch(function () { showManualBackup(payload); });
+    } else {
+      showManualBackup(payload);
+    }
+  });
+
+  function showManualBackup(payload) {
+    var wrap = document.getElementById("manualBackup");
+    var ta = document.getElementById("backupText");
+    ta.value = payload;
+    wrap.hidden = false;
+    ta.addEventListener("click", function () { ta.select(); });
+    ta.focus();
+    ta.select();
+  }
+
+  var importStatus = document.getElementById("importStatus");
+  var importFile = document.getElementById("importFile");
+  document.getElementById("importBtn").addEventListener("click", function () { importFile.click(); });
+  importFile.addEventListener("change", function () {
+    var file = importFile.files && importFile.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var parsed = JSON.parse(String(reader.result));
+        state = Object.assign(defaultState(), parsed);
+        saveState();
+        importStatus.textContent = "Yedek yüklendi, sayfa yenileniyor…";
+        importStatus.style.color = "var(--good)";
+        setTimeout(function () { window.location.reload(); }, 600);
+      } catch (e) {
+        importStatus.textContent = "Bu dosya okunamadı. Doğru yedek dosyası olduğundan emin ol.";
+        importStatus.style.color = "var(--bad)";
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    document.getElementById("resetConfirm").hidden = false;
+  });
+  document.getElementById("resetConfirmNo").addEventListener("click", function () {
+    document.getElementById("resetConfirm").hidden = true;
+  });
+  document.getElementById("resetConfirmYes").addEventListener("click", function () {
+    state = defaultState();
+    saveState();
+    window.location.reload();
+  });
+
+  /* ---------------- Rendering: home / route ---------------- */
+
+  var routeEl = document.getElementById("route");
+  var statMastered = document.getElementById("statMastered");
+  var statPoints = document.getElementById("statPoints");
+  var statStreak = document.getElementById("statStreak");
+  var weakTile = document.getElementById("weakTile");
+
+  // Keeps the header numbers (and the "eksik kelimelerim" tile) live —
+  // called after every card flip / quiz answer, not just when the panel
+  // closes, so a student can see their own progress change immediately.
+  // The tile is a permanent, always-visible place (not a banner that only
+  // shows up sometimes) — closed today, it's still exactly where the
+  // student left it, whether or not there's anything in it right now.
+  var RING_CIRCUMFERENCE = 2 * Math.PI * 52;
+
+  function refreshStats() {
+    var mastered = totalMasteredCount();
+    statMastered.textContent = mastered;
+    statPoints.textContent = state.points;
+    statStreak.textContent = state.streak;
+
+    var ringFill = document.getElementById("ringFill");
+    if (ringFill) {
+      var pctDone = TOTAL_WORDS ? Math.min(1, mastered / TOTAL_WORDS) : 0;
+      ringFill.style.strokeDasharray = RING_CIRCUMFERENCE;
+      ringFill.style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - pctDone);
+    }
+
+    var lvl = currentLevel(mastered);
+    var levelIcon = document.getElementById("levelIcon");
+    var levelTitle = document.getElementById("levelTitle");
+    if (levelIcon) levelIcon.textContent = lvl.icon;
+    if (levelTitle) levelTitle.textContent = lvl.title;
+
+    var streakIcon = document.getElementById("streakIcon");
+    if (streakIcon) streakIcon.classList.toggle("pulse", state.streak > 0);
+
+    var earnedBadges = checkBadges();
+    if (badgeSheet.classList.contains("open") && earnedBadges.length) renderBadgeGrid();
+    badgeTriggerText.textContent = "Rozetler " + Object.keys(state.badges).length + "/" + BADGES.length;
+
+    var weakCount = collectWeakWords().length;
+    var motivateText = document.getElementById("motivateText");
+    if (motivateText) motivateText.textContent = motivateMessage(mastered, weakCount);
+    weakTile.classList.toggle("has-items", weakCount > 0);
+    if (weakCount === 0) {
+      weakTile.innerHTML = '<span class="msg">Şu an eksik/yanlış kelimen yok — harika gidiyorsun.</span>' +
+        '<button type="button" disabled>Tekrar Et</button>';
+    } else {
+      weakTile.innerHTML =
+        '<span class="msg"><strong>' + weakCount + '</strong> kelimede zorlanıyorsun. Buraya her zaman dönüp onları giderebilirsin.</span>' +
+        '<button id="weakBtn" type="button">Tekrar Et</button>';
+      document.getElementById("weakBtn").addEventListener("click", openWeakReview);
+    }
+
+    // The panel's own topic-completion bar — reflects the unit (or the
+    // cross-unit weak-word set) currently open, updated after every mark.
+    if (current.unit) {
+      var total = current.unit.words.length;
+      var mastered = unitMasteredCount(current.unit);
+      var pct = total ? Math.round((mastered / total) * 100) : 0;
+      document.getElementById("upFill").style.width = pct + "%";
+      document.getElementById("upPct").textContent = pct + "%";
+      document.getElementById("upFrac").textContent = mastered + " / " + total + " kelime öğrenildi";
+    }
+  }
+
+  function miniBarMarkup(pct, complete) {
+    return '<div class="mini-bar"><div class="mini-fill' + (complete ? ' complete' : '') + '" style="width:' + pct + '%"></div></div>';
+  }
+
+  function renderRoute() {
+    routeEl.innerHTML = "";
+    UNITS.forEach(function (unit) {
+      var mastered = unitMasteredCount(unit);
+      var pct = Math.round((mastered / unit.words.length) * 100);
+      var nodeClass = "node" + (pct === 100 ? " complete" : pct > 0 ? " has-progress" : "");
+      var uColor = UNIT_COLORS[(unit.id - 1) % UNIT_COLORS.length];
+
+      var stop = document.createElement("div");
+      stop.className = "stop";
+      stop.style.setProperty("--u-color", uColor);
+      stop.innerHTML =
+        '<div class="' + nodeClass + '" aria-hidden="true">' + (pct === 100 ? "✓" : (UNIT_ICONS[unit.id] || unit.id)) + '</div>' +
+        '<button class="stop-btn" data-unit="' + unit.id + '">' +
+          '<span class="stop-info">' +
+            '<span class="en">' + unit.id + '. ' + unit.en + '</span>' +
+            '<span class="tr">' + unit.tr + '</span>' +
+          '</span>' +
+          '<span class="stop-progress">' + miniBarMarkup(pct, pct === 100) + '<span class="pct">' + mastered + '/' + unit.words.length + '</span></span>' +
+        '</button>';
+      routeEl.appendChild(stop);
+    });
+
+    refreshStats();
+  }
+
+  routeEl.addEventListener("click", function (e) {
+    var btn = e.target.closest(".stop-btn");
+    if (!btn) return;
+    openUnit(parseInt(btn.dataset.unit, 10));
+  });
+
+  /* ---------------- Panel ---------------- */
+
+  var backdrop = document.getElementById("backdrop");
+  var panel = document.getElementById("panel");
+  var panelTitle = document.getElementById("panelTitle");
+  var panelSubtitle = document.getElementById("panelSubtitle");
+  var panelBody = document.getElementById("panelBody");
+  var tabs = document.getElementById("tabs");
+
+  var current = { unit: null, tab: "cards", cardIndex: 0, flipped: false, quiz: null, write: null, resumed: false };
+
+  function openUnit(unitId) {
+    current.unit = UNITS.find(function (u) { return u.id === unitId; });
+    current.tab = "cards";
+    var saved = state.lastCardIndex[unitId];
+    current.cardIndex = (typeof saved === "number" && saved > 0 && saved < current.unit.words.length) ? saved : 0;
+    current.resumed = current.cardIndex > 0;
+    current.flipped = false;
+    current.quiz = null;
+    current.write = null;
+    panelTitle.textContent = current.unit.id + ". " + current.unit.en;
+    panelSubtitle.textContent = current.unit.tr;
+    setActiveTab("cards");
+    refreshStats();
+    backdrop.classList.add("open");
+    panel.classList.add("open");
+  }
+
+  // Cross-unit review session built from every word currently flagged
+  // "review" — this is what answers "nasıl geliştirecek": mistakes are
+  // tracked per word and can be drilled on their own, separate from the
+  // unit route.
+  function openWeakReview() {
+    var words = collectWeakWords();
+    if (!words.length) return;
+    current.unit = { id: "weak", en: "Zayıf Kelimelerim", tr: words.length + " kelime · karışık ünitelerden", words: words };
+    current.tab = "cards";
+    current.cardIndex = 0;
+    current.resumed = false;
+    current.flipped = false;
+    current.quiz = null;
+    current.write = null;
+    panelTitle.textContent = "Zayıf Kelimelerim";
+    panelSubtitle.textContent = current.unit.tr;
+    setActiveTab("cards");
+    refreshStats();
+    backdrop.classList.add("open");
+    panel.classList.add("open");
+  }
+
+  function closePanel() {
+    backdrop.classList.remove("open");
+    panel.classList.remove("open");
+    renderRoute();
+  }
+
+  document.getElementById("closePanel").addEventListener("click", closePanel);
+  backdrop.addEventListener("click", closePanel);
+
+  tabs.addEventListener("click", function (e) {
+    var btn = e.target.closest(".tab");
+    if (!btn) return;
+    setActiveTab(btn.dataset.tab);
+  });
+
+  function setActiveTab(tab) {
+    current.tab = tab;
+    Array.prototype.forEach.call(tabs.querySelectorAll(".tab"), function (t) {
+      t.classList.toggle("active", t.dataset.tab === tab);
+    });
+    if (tab === "cards") { current.flipped = false; renderCards(); }
+    if (tab === "quiz") { startQuiz(); }
+    if (tab === "write") { startWrite(); }
+    if (tab === "list") { renderList(); }
+  }
+
+  /* ---- Flashcards ---- */
+
+  function renderCards() {
+    var words = current.unit.words;
+    var idx = current.cardIndex;
+    var w = words[idx];
+
+    var resumeNote = current.resumed ? '<div class="resume-note">Kaldığın yerden devam ediyorsun</div>' : "";
+    current.resumed = false;
+
+    panelBody.innerHTML =
+      '<div class="fc-wrap">' +
+        resumeNote +
+        '<div class="fc-progress"><span>Kart ' + (idx + 1) + ' / ' + words.length + '</span><span>' + unitMasteredCount(current.unit) + ' öğrenildi</span></div>' +
+        '<div class="card-stage"><div class="card" id="fcCard">' +
+          '<div class="face front">' + speakerBtnHtml(w[0]) + '<div class="word">' + w[0] + '</div><div class="hint">Çevirmek için dokun</div></div>' +
+          '<div class="face back"><div class="tr-word">' + w[1] + '</div><div class="sentence">' + w[2] + '</div></div>' +
+        '</div></div>' +
+        '<div class="fc-actions">' +
+          '<button class="btn again" id="fcAgain">Tekrar Et</button>' +
+          '<button class="btn know" id="fcKnow">Biliyorum</button>' +
+        '</div>' +
+        (idx > 0 ? '<button class="restart-link" id="fcRestart" type="button">Baştan başla</button>' : "") +
+      '</div>';
+
+    var restartBtn = document.getElementById("fcRestart");
+    if (restartBtn) {
+      restartBtn.addEventListener("click", function () {
+        current.cardIndex = 0;
+        current.flipped = false;
+        if (typeof current.unit.id === "number") { delete state.lastCardIndex[current.unit.id]; saveState(); }
+        renderCards();
+      });
+    }
+
+    var cardEl = document.getElementById("fcCard");
+    cardEl.addEventListener("click", function () {
+      current.flipped = !current.flipped;
+      cardEl.classList.toggle("flipped", current.flipped);
+    });
+    wireSpeakButtons(cardEl);
+
+    document.getElementById("fcAgain").addEventListener("click", function () {
+      recordWrong(wordUnitId(w), w[0]);
+      refreshStats();
+      nextCard();
+    });
+    document.getElementById("fcKnow").addEventListener("click", function () {
+      var wasKnown = isKnown(wordUnitId(w), w[0]);
+      recordKnow(wordUnitId(w), w[0]);
+      if (!wasKnown) addPoints(2);
+      refreshStats();
+      nextCard();
+    });
+  }
+
+  function nextCard() {
+    var words = current.unit.words;
+    var unitId = current.unit.id;
+    current.flipped = false;
+    if (current.cardIndex < words.length - 1) {
+      current.cardIndex++;
+      // Remember the spot so closing mid-deck and coming back later resumes here.
+      if (typeof unitId === "number") { state.lastCardIndex[unitId] = current.cardIndex; saveState(); }
+      renderCards();
+    } else {
+      if (typeof unitId === "number") { delete state.lastCardIndex[unitId]; saveState(); }
+      panelBody.innerHTML = '<div class="empty-note">Bu ünitedeki tüm kartları tamamladın. Hızlı Sınav sekmesinden kendini test edebilirsin.</div>';
+      refreshStats();
+    }
+  }
+
+  /* ---- Quiz ---- */
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  // Words the student has already missed are put first, so a normal 8-word
+  // quiz round leans toward what actually needs practice instead of drawing
+  // evenly from words already mastered.
+  function buildQuizPool(words) {
+    var review = [], fresh = [], known = [];
+    words.forEach(function (w) {
+      var status = getRecord(wordUnitId(w), w[0]).status;
+      (status === "review" ? review : status === "known" ? known : fresh).push(w);
+    });
+    var ordered = shuffle(review).concat(shuffle(fresh)).concat(shuffle(known));
+    return ordered.slice(0, Math.min(8, ordered.length));
+  }
+
+  function startQuiz() {
+    var pool = buildQuizPool(current.unit.words);
+    current.quiz = { pool: pool, index: 0, score: 0, answered: false };
+    renderQuizQuestion();
+  }
+
+  function renderQuizQuestion() {
+    var q = current.quiz;
+    if (q.index >= q.pool.length) return renderQuizResult();
+
+    var target = q.pool[q.index];
+    var others = shuffle(current.unit.words.filter(function (w) { return w[0] !== target[0]; })).slice(0, 3);
+    var options = shuffle([target].concat(others));
+
+    panelBody.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress"><div class="fill" style="width:' + Math.round((q.index / q.pool.length) * 100) + '%"></div></div>' +
+        '<div class="quiz-q"><div class="eyebrow">Türkçe anlamı nedir?</div><div class="word">' + target[0] + '</div>' + speakerBtnHtml(target[0]) + '</div>' +
+        '<div class="options" id="quizOptions"></div>' +
+      '</div>';
+    wireSpeakButtons(panelBody);
+
+    var optWrap = document.getElementById("quizOptions");
+    options.forEach(function (opt) {
+      var b = document.createElement("button");
+      b.className = "opt";
+      b.textContent = opt[1];
+      b.addEventListener("click", function () { answerQuiz(b, opt, target, optWrap); });
+      optWrap.appendChild(b);
+    });
+  }
+
+  function answerQuiz(btn, opt, target, optWrap) {
+    if (current.quiz.answered) return;
+    current.quiz.answered = true;
+    var correct = opt[0] === target[0];
+    var uid = wordUnitId(target);
+    if (correct) {
+      current.quiz.score++;
+      addPoints(3);
+      recordQuizCorrect(uid, target[0]);
+    } else {
+      recordWrong(uid, target[0]);
+    }
+    refreshStats();
+
+    Array.prototype.forEach.call(optWrap.children, function (b) {
+      b.setAttribute("disabled", "true");
+      if (b.textContent === target[1]) b.classList.add("correct");
+    });
+    if (!correct) btn.classList.add("wrong");
+
+    setTimeout(function () {
+      current.quiz.index++;
+      current.quiz.answered = false;
+      renderQuizQuestion();
+    }, 700);
+  }
+
+  function renderQuizResult() {
+    var q = current.quiz;
+    if (q.pool.length > 0 && q.score === q.pool.length) state.everPerfectQuiz = true;
+    var missed = q.pool.length - q.score;
+    var missedNote = missed > 0
+      ? '<div class="sub">' + missed + ' kelimeyi "Zayıf Kelimelerim" listesine ekledik, oradan ayrıca tekrar edebilirsin.</div>'
+      : '';
+    panelBody.innerHTML =
+      '<div class="quiz-result">' +
+        '<div class="big">' + q.score + ' / ' + q.pool.length + '</div>' +
+        '<div class="sub">Doğru cevap. Kazanılan puan: ' + (q.score * 3) + '</div>' +
+        missedNote +
+        '<button class="btn primary" id="quizRetry" style="max-width:220px;margin-top:10px;">Tekrar Dene</button>' +
+      '</div>';
+    document.getElementById("quizRetry").addEventListener("click", startQuiz);
+    refreshStats();
+  }
+
+  /* ---- Write mode: type the missing word ---- */
+
+  function startWrite() {
+    var pool = buildQuizPool(current.unit.words);
+    current.write = { pool: pool, index: 0, score: 0, checked: false };
+    renderWriteQuestion();
+  }
+
+  function renderWriteQuestion() {
+    var w = current.write;
+    if (w.index >= w.pool.length) return renderWriteResult();
+
+    var target = w.pool[w.index];
+    panelBody.innerHTML =
+      '<div class="quiz-wrap">' +
+        '<div class="quiz-progress"><div class="fill" style="width:' + Math.round((w.index / w.pool.length) * 100) + '%"></div></div>' +
+        '<div class="quiz-q"><div class="eyebrow">Boşluğa gelecek İngilizce kelimeyi yaz</div><div class="word" style="font-size:1.15rem;">' + target[1] + '</div></div>' +
+        '<div class="write-sentence">' + blankSentence(target[2], target[0]) + '</div>' +
+        '<input type="text" class="write-input" id="writeInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="İngilizce kelimeyi yaz…">' +
+        '<div class="write-feedback" id="writeFeedback"></div>' +
+        '<button class="btn primary" id="writeAction">Kontrol Et</button>' +
+      '</div>';
+
+    var input = document.getElementById("writeInput");
+    input.focus();
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); handleWriteAction(); } });
+    document.getElementById("writeAction").addEventListener("click", handleWriteAction);
+  }
+
+  function handleWriteAction() {
+    var w = current.write;
+    if (w.checked) { w.index++; w.checked = false; renderWriteQuestion(); return; }
+
+    var target = w.pool[w.index];
+    var input = document.getElementById("writeInput");
+    var val = input.value.trim().toLowerCase();
+    var correct = val === target[0].toLowerCase();
+    var uid = wordUnitId(target);
+
+    if (correct) { w.score++; addPoints(4); recordQuizCorrect(uid, target[0]); }
+    else { recordWrong(uid, target[0]); }
+    refreshStats();
+
+    w.checked = true;
+    input.disabled = true;
+    input.classList.add(correct ? "correct" : "wrong");
+    var fb = document.getElementById("writeFeedback");
+    fb.className = "write-feedback " + (correct ? "correct" : "wrong");
+    fb.textContent = correct ? "Doğru!" : "Doğrusu: " + target[0];
+
+    var actionBtn = document.getElementById("writeAction");
+    actionBtn.textContent = (w.index < w.pool.length - 1) ? "Sonraki" : "Bitir";
+  }
+
+  function renderWriteResult() {
+    var w = current.write;
+    if (w.pool.length > 0 && w.score === w.pool.length) state.everPerfectQuiz = true;
+    var missed = w.pool.length - w.score;
+    var missedNote = missed > 0
+      ? '<div class="sub">' + missed + ' kelimeyi "Zayıf Kelimelerim" listesine ekledik, oradan ayrıca tekrar edebilirsin.</div>'
+      : '';
+    panelBody.innerHTML =
+      '<div class="quiz-result">' +
+        '<div class="big">' + w.score + ' / ' + w.pool.length + '</div>' +
+        '<div class="sub">Doğru cevap. Kazanılan puan: ' + (w.score * 4) + '</div>' +
+        missedNote +
+        '<button class="btn primary" id="writeRetry" style="max-width:220px;margin-top:10px;">Tekrar Dene</button>' +
+      '</div>';
+    document.getElementById("writeRetry").addEventListener("click", startWrite);
+    refreshStats();
+  }
+
+  /* ---- Word list ---- */
+
+  function renderList() {
+    var rows = current.unit.words.map(function (w) {
+      var uid = wordUnitId(w);
+      var rec = getRecord(uid, w[0]);
+      var badgeText = rec.status === "known" ? "öğrenildi" : rec.status === "review" ? "tekrar (" + rec.wrong + "x yanlış)" : "yeni";
+      return '<div class="word-row status-' + rec.status + '">' +
+               '<div class="row-top">' +
+                 '<span class="left-group"><span class="en">' + w[0] + '</span>' + speakerBtnHtml(w[0]) + '</span>' +
+                 '<span class="right-group">' +
+                   '<span class="tr">' + w[1] + '</span>' +
+                   '<span class="badge ' + rec.status + '">' + badgeText + '</span>' +
+                 '</span>' +
+               '</div>' +
+               '<div class="ex">' + w[2] + '</div>' +
+             '</div>';
+    }).join("");
+    panelBody.innerHTML = '<div class="wordlist">' + rows + '</div>';
+    wireSpeakButtons(panelBody);
+  }
+
+  /* ---------------- Init ---------------- */
+
+  function initApp() {
+    applyTheme();
+    wireAccountSettings();
+
+    if (!cloudEnabled) {
+      renderRoute();
+      return;
+    }
+
+    document.getElementById("footerCredit").innerHTML =
+      "Kelime Rotası &middot; MEB 8. sınıf İngilizce müfredatı ünitelerine göre hazırlanmıştır &middot; İlerlemen sınıfına buluta kaydedilir.";
+
+    var meta = loadStudentMeta();
+    if (!meta) {
+      wireGate();
+      showGate("");
+      return;
+    }
+
+    studentMeta = meta;
+    hydrateFromCloud().then(function () {
+      renderRoute();
+    });
+  }
+
+  initApp();
+})();
+</script>

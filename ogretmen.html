@@ -1,0 +1,484 @@
+<title>Kelime Rotası — Öğretmen Paneli</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B2140; --ink-soft: #3A3F66; --paper: #F3F4FB; --paper-raised: #FFFFFF;
+    --line: #DBDDEF; --muted: #696E96; --accent: #5B4FE9; --accent-ink: #FFFFFF;
+    --good: #10B981; --good-soft: #D9F6EA; --bad: #D8483F; --bad-soft: #FBE7E4;
+    --bad-ink: #FFFFFF; --star: #7C3AED; --star-soft: #ECE3FD;
+    --shadow: 220 45% 20%; --radius-lg: 28px; --radius-md: 18px; --radius-sm: 12px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #EDEEFB; --ink-soft: #C6C9EC; --paper: #12142B; --paper-raised: #1C1F3E;
+      --line: #2E3159; --muted: #9498C4; --accent: #8C7CFF; --accent-ink: #16102E;
+      --good: #34E7B4; --good-soft: #123428; --bad: #F17469; --bad-soft: #3A1F1F;
+      --bad-ink: #2B1210; --star: #C4B5FD; --star-soft: #2E2350;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #EDEEFB; --ink-soft: #C6C9EC; --paper: #12142B; --paper-raised: #1C1F3E;
+    --line: #2E3159; --muted: #9498C4; --accent: #8C7CFF; --accent-ink: #16102E;
+    --good: #34E7B4; --good-soft: #123428; --bad: #F17469; --bad-soft: #3A1F1F;
+    --bad-ink: #2B1210; --star: #C4B5FD; --star-soft: #2E2350;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+  h1, h2, h3 { font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; margin: 0; }
+  button, input { font-family: inherit; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  a { color: inherit; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 28px; }
+  .brandline { display: flex; align-items: center; gap: 10px; }
+  .brandmark {
+    width: 38px; height: 38px; border-radius: 11px; background: linear-gradient(135deg, #4A6CF7, #8B5CF6); color: #FFFFFF;
+    display: flex; align-items: center; justify-content: center; flex: none;
+    box-shadow: 0 0 16px rgba(139, 108, 255, 0.5);
+  }
+  .brandmark svg { width: 20px; height: 20px; }
+  .brandline h1 { font-size: 1.35rem; }
+  .brandline .sub { color: var(--muted); font-size: 0.85rem; }
+
+  .btn {
+    all: unset; box-sizing: border-box; padding: 11px 18px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.9rem;
+    cursor: pointer; border: 1px solid var(--line); text-align: center;
+  }
+  .btn.primary { background: linear-gradient(135deg, var(--accent), var(--star)); color: var(--accent-ink); border-color: transparent; box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 40%, transparent); }
+  .btn.ghost { background: var(--paper-raised); color: var(--ink-soft); }
+  .btn.danger { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+  .btn:active { transform: scale(0.98); }
+  .btn[disabled] { opacity: 0.6; pointer-events: none; }
+
+  .card {
+    background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+    padding: 20px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field label { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .field input {
+    padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 0.95rem;
+  }
+  .field input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+
+  .auth-shell { max-width: 380px; margin: 8vh auto 0; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
+  .auth-shell .card { width: 100%; text-align: left; }
+  .auth-tabs { display: flex; gap: 4px; background: var(--paper-raised); border: 1px solid var(--line); border-radius: 999px; padding: 3px; width: 100%; }
+  .auth-tabs button { all: unset; box-sizing: border-box; flex: 1; text-align: center; padding: 9px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: var(--muted); cursor: pointer; }
+  .auth-tabs button.active { background: var(--accent); color: var(--accent-ink); }
+  .auth-msg { font-size: 0.85rem; min-height: 1.2em; }
+  .auth-msg.error { color: var(--bad); }
+  .auth-msg.ok { color: var(--good); }
+
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 30px 0 14px; }
+  .section-head h2 { font-size: 1.05rem; }
+
+  .class-grid { display: grid; gap: 12px; }
+  .class-card {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+    padding: 16px 18px; cursor: pointer;
+  }
+  .class-card:hover { border-color: var(--accent); }
+  .class-card .name { font-weight: 700; font-size: 1rem; }
+  .class-card .meta { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+  .class-card .code {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 0.95rem;
+    background: linear-gradient(135deg, var(--star-soft), color-mix(in srgb, var(--accent) 16%, var(--star-soft)));
+    color: var(--star); padding: 6px 12px; border-radius: 999px; flex: none;
+  }
+
+  .empty-note { text-align: center; color: var(--muted); padding: 30px 16px; font-size: 0.92rem; }
+
+  .back-link { all: unset; display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.85rem; cursor: pointer; margin-bottom: 16px; }
+  .back-link:hover { color: var(--accent); }
+
+  .class-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .class-head h2 { font-size: 1.25rem; }
+  .class-head .code-pill {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--star-soft), color-mix(in srgb, var(--accent) 16%, var(--star-soft)));
+    color: var(--star); padding: 10px 18px; border-radius: var(--radius-sm);
+  }
+  .class-head .code-help { color: var(--muted); font-size: 0.78rem; margin-top: 6px; max-width: 32ch; }
+
+  table.students { width: 100%; border-collapse: collapse; }
+  table.students th, table.students td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+  table.students th { color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  table.students td.num { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+  table.students tr:last-child td { border-bottom: none; }
+  .pct-cell { display: flex; align-items: center; gap: 8px; }
+  .pct-bar { width: 70px; height: 7px; border-radius: 999px; background: var(--line); overflow: hidden; flex: none; }
+  .pct-bar .fill { height: 100%; background: var(--good); border-radius: 999px; }
+  .weak-pill { font-size: 0.72rem; padding: 3px 9px; border-radius: 999px; background: var(--bad-soft); color: var(--bad); font-weight: 600; }
+  .weak-pill.zero { background: var(--line); color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 6px 16px; }
+
+  .loading-note { text-align: center; color: var(--muted); padding: 40px; }
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brandline">
+      <div class="brandmark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="12 7 15 12 12 17 9 12"/></svg>
+      </div>
+      <div>
+        <h1>Kelime Rotası</h1>
+        <div class="sub">Öğretmen Paneli</div>
+      </div>
+    </div>
+    <button class="btn ghost" id="logoutBtn" type="button" hidden>Çıkış Yap</button>
+  </div>
+
+  <div id="loadingNote" class="loading-note">Yükleniyor…</div>
+
+  <!-- ---- Giriş / Kayıt ---- -->
+  <div class="auth-shell" id="authShell" hidden>
+    <div class="card">
+      <div class="auth-tabs" id="authTabs">
+        <button data-mode="login" class="active" type="button">Giriş Yap</button>
+        <button data-mode="signup" type="button">Kayıt Ol</button>
+      </div>
+      <div style="height:16px;"></div>
+      <div class="field" id="nameField" hidden>
+        <label for="authName">Adın Soyadın</label>
+        <input id="authName" type="text" autocomplete="name" placeholder="Ör. Ebrar Yılmaz">
+      </div>
+      <div class="field">
+        <label for="authEmail">E-posta</label>
+        <input id="authEmail" type="email" autocomplete="email" placeholder="ornek@eposta.com">
+      </div>
+      <div class="field">
+        <label for="authPassword">Şifre</label>
+        <input id="authPassword" type="password" autocomplete="current-password" placeholder="En az 6 karakter">
+      </div>
+      <button class="btn primary" id="authSubmit" type="button" style="width:100%;">Giriş Yap</button>
+      <div class="auth-msg" id="authMsg"></div>
+    </div>
+  </div>
+
+  <!-- ---- Panel gövdesi (giriş yapınca) ---- -->
+  <div id="appShell" hidden>
+
+    <!-- Sınıf listesi görünümü -->
+    <div id="classListView">
+      <div class="section-head">
+        <h2>Sınıflarım</h2>
+        <button class="btn primary" id="newClassBtn" type="button">+ Yeni Sınıf</button>
+      </div>
+      <div class="field" id="newClassField" hidden style="max-width:320px;">
+        <input id="newClassName" type="text" placeholder="Sınıf adı, ör. 8-A">
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn primary" id="newClassSave" type="button">Oluştur</button>
+          <button class="btn ghost" id="newClassCancel" type="button">Vazgeç</button>
+        </div>
+      </div>
+      <div class="class-grid" id="classGrid"></div>
+      <div class="empty-note" id="classEmptyNote" hidden>Henüz bir sınıfın yok. "+ Yeni Sınıf" ile ilk sınıfını oluştur.</div>
+    </div>
+
+    <!-- Sınıf detay görünümü -->
+    <div id="classDetailView" hidden>
+      <button class="back-link" id="backToList" type="button">← Sınıflarıma dön</button>
+      <div class="class-head">
+        <div>
+          <h2 id="detailClassName">—</h2>
+          <div class="code-help" id="detailStudentCount">—</div>
+        </div>
+        <div>
+          <div class="code-pill" id="detailClassCode">——————</div>
+          <div class="code-help">Öğrenciler bu kodla katılır</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="students" id="studentsTable">
+          <thead>
+            <tr><th>Öğrenci</th><th>Öğrenilen Kelime</th><th>Puan</th><th>Seri</th><th>Zorlandığı Kelime</th></tr>
+          </thead>
+          <tbody id="studentsTbody"></tbody>
+        </table>
+        <div class="empty-note" id="studentsEmptyNote" hidden>Bu sınıfa henüz katılan öğrenci yok. Sınıf kodunu öğrencilerinle paylaş.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var TOTAL_WORDS = 140;
+
+  var CFG = window.KELIME_ROTASI_CONFIG || {};
+  var cloudEnabled = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY &&
+    CFG.SUPABASE_URL.indexOf("YOUR-PROJECT") === -1 &&
+    CFG.SUPABASE_ANON_KEY.indexOf("YOUR-ANON-KEY") === -1 &&
+    window.supabase);
+
+  var loadingNote = document.getElementById("loadingNote");
+
+  if (!cloudEnabled) {
+    loadingNote.innerHTML =
+      "Öğretmen paneli henüz bir Supabase projesine bağlı değil.<br><br>" +
+      "<code>config.js</code> dosyasına kendi Supabase adresini ve anahtarını ekleyince bu panel aktif olacak — " +
+      "adımlar için KURULUM-REHBERI.md dosyasına bakabilirsin.";
+    loadingNote.style.textAlign = "left";
+    loadingNote.style.maxWidth = "480px";
+    loadingNote.style.margin = "40px auto";
+    return;
+  }
+
+  var supa = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+
+  var authShell = document.getElementById("authShell");
+  var appShell = document.getElementById("appShell");
+  var logoutBtn = document.getElementById("logoutBtn");
+  var authMsg = document.getElementById("authMsg");
+  var authMode = "login";
+
+  var teacher = null;      // { id, name, email }
+  var classes = [];        // sınıf listesi
+  var activeClassId = null;
+
+  /* ---------------- Kimlik doğrulama ---------------- */
+
+  document.getElementById("authTabs").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    authMode = b.dataset.mode;
+    Array.prototype.forEach.call(document.querySelectorAll("#authTabs button"), function (btn) {
+      btn.classList.toggle("active", btn.dataset.mode === authMode);
+    });
+    document.getElementById("authSubmit").textContent = authMode === "login" ? "Giriş Yap" : "Kayıt Ol";
+    document.getElementById("nameField").hidden = authMode !== "signup";
+    authMsg.textContent = ""; authMsg.className = "auth-msg";
+  });
+
+  document.getElementById("authSubmit").addEventListener("click", function () {
+    var email = document.getElementById("authEmail").value.trim();
+    var password = document.getElementById("authPassword").value;
+    var name = document.getElementById("authName").value.trim();
+    if (!email || !password) { setAuthMsg("E-posta ve şifre gerekli.", true); return; }
+
+    var btn = document.getElementById("authSubmit");
+    btn.disabled = true;
+    setAuthMsg("", false);
+
+    var action = authMode === "signup"
+      ? supa.auth.signUp({ email: email, password: password, options: { data: { name: name } } })
+      : supa.auth.signInWithPassword({ email: email, password: password });
+
+    action.then(function (res) {
+      btn.disabled = false;
+      if (res.error) { setAuthMsg(translateAuthError(res.error.message), true); return; }
+      if (authMode === "signup" && res.data && !res.data.session) {
+        setAuthMsg("Kayıt oluşturuldu. E-postana gelen onay bağlantısına tıkladıktan sonra giriş yapabilirsin.", false, true);
+        return;
+      }
+      boot();
+    }).catch(function () {
+      btn.disabled = false;
+      setAuthMsg("Bağlantı hatası, tekrar dene.", true);
+    });
+  });
+
+  function setAuthMsg(text, isError, isOk) {
+    authMsg.textContent = text;
+    authMsg.className = "auth-msg" + (isError ? " error" : isOk ? " ok" : "");
+  }
+
+  function translateAuthError(msg) {
+    if (/already registered/i.test(msg)) return "Bu e-posta zaten kayıtlı — Giriş Yap sekmesini dene.";
+    if (/invalid login/i.test(msg)) return "E-posta veya şifre yanlış.";
+    if (/password/i.test(msg) && /6/i.test(msg)) return "Şifre en az 6 karakter olmalı.";
+    return "Bir sorun oluştu: " + msg;
+  }
+
+  logoutBtn.addEventListener("click", function () {
+    supa.auth.signOut().then(function () { window.location.reload(); });
+  });
+
+  /* ---------------- Açılış: oturum var mı? ---------------- */
+
+  supa.auth.getSession().then(function (res) {
+    var session = res.data && res.data.session;
+    if (session && session.user && session.user.email) { boot(); }
+    else {
+      loadingNote.hidden = true;
+      authShell.hidden = false;
+    }
+  }).catch(function () {
+    loadingNote.hidden = true;
+    authShell.hidden = false;
+  });
+
+  function boot() {
+    authShell.hidden = true;
+    appShell.hidden = true;
+    loadingNote.hidden = false;
+    loadingNote.textContent = "Yükleniyor…";
+
+    supa.auth.getUser().then(function (res) {
+      var user = res.data && res.data.user;
+      if (!user) throw new Error("no-user");
+      return supa.from("teachers").select("*").eq("id", user.id).single();
+    }).then(function (res) {
+      teacher = res.data;
+      logoutBtn.hidden = false;
+      loadingNote.hidden = true;
+      appShell.hidden = false;
+      return loadClasses();
+    }).catch(function () {
+      loadingNote.hidden = true;
+      authShell.hidden = false;
+    });
+  }
+
+  /* ---------------- Sınıf listesi ---------------- */
+
+  function loadClasses() {
+    return supa.from("classes").select("*, students(count)").eq("teacher_id", teacher.id).order("created_at").then(function (res) {
+      classes = res.data || [];
+      renderClassList();
+    });
+  }
+
+  function renderClassList() {
+    var grid = document.getElementById("classGrid");
+    document.getElementById("classEmptyNote").hidden = classes.length > 0;
+    grid.innerHTML = classes.map(function (c) {
+      var count = (c.students && c.students[0] && c.students[0].count) || 0;
+      return '<div class="class-card" data-id="' + c.id + '">' +
+        '<div><div class="name">' + escapeHtml(c.name) + '</div><div class="meta">' + count + ' öğrenci</div></div>' +
+        '<div class="code">' + c.code + '</div>' +
+      '</div>';
+    }).join("");
+    Array.prototype.forEach.call(grid.querySelectorAll(".class-card"), function (el) {
+      el.addEventListener("click", function () { openClassDetail(el.dataset.id); });
+    });
+  }
+
+  document.getElementById("newClassBtn").addEventListener("click", function () {
+    document.getElementById("newClassField").hidden = false;
+    document.getElementById("newClassName").focus();
+  });
+  document.getElementById("newClassCancel").addEventListener("click", function () {
+    document.getElementById("newClassField").hidden = true;
+    document.getElementById("newClassName").value = "";
+  });
+  document.getElementById("newClassSave").addEventListener("click", function () {
+    var name = document.getElementById("newClassName").value.trim();
+    if (!name) return;
+    var btn = document.getElementById("newClassSave");
+    btn.disabled = true;
+    supa.from("classes").insert({ teacher_id: teacher.id, name: name }).then(function (res) {
+      btn.disabled = false;
+      if (res.error) return;
+      document.getElementById("newClassField").hidden = true;
+      document.getElementById("newClassName").value = "";
+      loadClasses();
+    });
+  });
+
+  /* ---------------- Sınıf detayı ---------------- */
+
+  function openClassDetail(classId) {
+    activeClassId = classId;
+    var cls = classes.find(function (c) { return c.id === classId; });
+    if (!cls) return;
+
+    document.getElementById("classListView").hidden = true;
+    document.getElementById("classDetailView").hidden = false;
+    document.getElementById("detailClassName").textContent = cls.name;
+    document.getElementById("detailClassCode").textContent = cls.code;
+    document.getElementById("detailStudentCount").textContent = "Yükleniyor…";
+    document.getElementById("studentsTbody").innerHTML = "";
+    document.getElementById("studentsEmptyNote").hidden = true;
+
+    loadStudents(classId);
+  }
+
+  document.getElementById("backToList").addEventListener("click", function () {
+    document.getElementById("classDetailView").hidden = true;
+    document.getElementById("classListView").hidden = false;
+    loadClasses();
+  });
+
+  function loadStudents(classId) {
+    var studentsById = {};
+    return supa.from("students").select("*").eq("class_id", classId).order("name").then(function (res) {
+      var students = res.data || [];
+      students.forEach(function (s) { studentsById[s.id] = s; });
+      document.getElementById("detailStudentCount").textContent = students.length + " öğrenci";
+      if (!students.length) {
+        document.getElementById("studentsEmptyNote").hidden = false;
+        return null;
+      }
+      var ids = students.map(function (s) { return s.id; });
+      return supa.from("word_progress").select("student_id, status").in("student_id", ids);
+    }).then(function (res) {
+      var progressByStudent = {};
+      if (res && res.data) {
+        res.data.forEach(function (row) {
+          if (!progressByStudent[row.student_id]) progressByStudent[row.student_id] = { known: 0, review: 0 };
+          if (row.status === "known") progressByStudent[row.student_id].known++;
+          if (row.status === "review") progressByStudent[row.student_id].review++;
+        });
+      }
+      renderStudentsTable(studentsById, progressByStudent);
+    });
+  }
+
+  function renderStudentsTable(studentsById, progressByStudent) {
+    var rows = Object.keys(studentsById).map(function (id) { return studentsById[id]; })
+      .sort(function (a, b) {
+        var pa = (progressByStudent[a.id] && progressByStudent[a.id].known) || 0;
+        var pb = (progressByStudent[b.id] && progressByStudent[b.id].known) || 0;
+        return pb - pa;
+      });
+
+    var html = rows.map(function (s) {
+      var prog = progressByStudent[s.id] || { known: 0, review: 0 };
+      var pct = Math.round((prog.known / TOTAL_WORDS) * 100);
+      return "<tr>" +
+        "<td>" + escapeHtml(s.name) + "</td>" +
+        '<td><div class="pct-cell"><div class="pct-bar"><div class="fill" style="width:' + pct + '%"></div></div>' +
+          '<span class="num">' + prog.known + "/" + TOTAL_WORDS + "</span></div></td>" +
+        '<td class="num">' + (s.points || 0) + "</td>" +
+        '<td class="num">' + (s.streak || 0) + " gün</td>" +
+        "<td>" + (prog.review > 0
+          ? '<span class="weak-pill">' + prog.review + " kelime</span>"
+          : '<span class="weak-pill zero">yok</span>') + "</td>" +
+      "</tr>";
+    }).join("");
+    document.getElementById("studentsTbody").innerHTML = html;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+})();
+</script>

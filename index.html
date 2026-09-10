@@ -1,0 +1,58 @@
+<title>Kelime Rotası</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B2140; --paper: #F3F4FB; --paper-raised: #FFFFFF; --line: #DBDDEF;
+    --muted: #696E96; --accent: #FF5D73; --accent-ink: #FFFFFF; --radius-lg: 28px; --radius-md: 18px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #EDEEFB; --paper: #12142B; --paper-raised: #1C1F3E; --line: #2E3159;
+      --muted: #9498C4; --accent: #FF7C8F; --accent-ink: #1B1030;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper); color: var(--ink); font-family: 'Figtree', system-ui, sans-serif;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .shell { max-width: 420px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .brandmark {
+    width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #4A6CF7, #8B5CF6); color: #FFFFFF;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+  }
+  h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.7rem; margin: 0; }
+  p { color: var(--muted); font-size: 0.95rem; line-height: 1.5; margin: 4px 0 20px; }
+  .choices { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+  a.choice {
+    display: block; text-decoration: none; color: var(--ink); background: var(--paper-raised);
+    border: 1px solid var(--line); border-radius: var(--radius-md); padding: 18px 20px; text-align: left;
+  }
+  a.choice:hover { border-color: var(--accent); }
+  a.choice .t { font-weight: 700; font-size: 1.02rem; }
+  a.choice .d { color: var(--muted); font-size: 0.85rem; margin-top: 3px; }
+</style>
+
+<div class="shell">
+  <div class="brandmark" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="30" height="30"><circle cx="12" cy="12" r="9"/><polygon points="12 7 15 12 12 17 9 12"/></svg>
+  </div>
+  <h1>Kelime Rotası</h1>
+  <p>LGS 8. sınıf İngilizce kelime çalışma uygulaması</p>
+  <div class="choices">
+    <a class="choice" href="ogrenci.html">
+      <div class="t">Öğrenciyim</div>
+      <div class="d">Sınıf kodumla katılıp kelime çalışmaya başlayayım</div>
+    </a>
+    <a class="choice" href="ogretmen.html">
+      <div class="t">Öğretmenim</div>
+      <div class="d">Sınıf oluşturup öğrencilerimin ilerlemesini görmek istiyorum</div>
+    </a>
+  </div>
+</div>
